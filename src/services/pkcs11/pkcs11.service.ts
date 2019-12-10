@@ -10,16 +10,33 @@ import {
 } from 'pkcs11js';
 import { EidGateway } from 'src/eid-gateway/eid-gateway.gateway';
 import { EidUser } from 'src/models/EidUser';
+import * as Devices from 'smartcard/lib/Devices';
+
 
 
 @Injectable()
 export class Pkcs11Service {
   private pkcs11: PKCS11;
+  private devices: Devices;
   private LIB = '/usr/lib/x86_64-linux-gnu/libbeidpkcs11.so.0'; // todo: get from environment (docker-compose)
 
   constructor(private readonly eidGateway: EidGateway) {
     this.pkcs11 = new PKCS11();
+    this.devices = new Devices();
     this.pkcs11.load(this.LIB);    
+    this.listenToEidCardEvents();
+  }
+
+
+  private listenToEidCardEvents() {
+    this.devices.on('device-activated', event => {
+      const device = event.device;
+      console.log(`Device: ${device} activated`)
+      device.on('card-inserted', async (ev) => {
+        // read here
+        await this.getEidUserFromReader()
+      })
+    })
   }
 
   private openSession(): Buffer {
@@ -81,7 +98,7 @@ export class Pkcs11Service {
     return eidUser;
   }
 
-  public async getEidUserFromReader(): Promise<void> {
+  private async getEidUserFromReader(): Promise<void> {
     try {
        await this.eidGateway.sendEidUser(this.readObjects(this.openSession()));
     } catch (error) {

@@ -9,7 +9,7 @@ export class AppController {
   @Get()
   async getHello(): Promise<void> {
    // console.log(this.pkcs11Service.readEidData());
-   await this.pkcs11Service.getEidUserFromReader();
+   //await this.pkcs11Service.getEidUserFromReader();
    
   }
 }

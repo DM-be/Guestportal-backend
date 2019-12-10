@@ -28,7 +28,8 @@
     "pkcs11js": "^1.0.19",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.0",
-    "rxjs": "^6.5.3"
+    "rxjs": "^6.5.3",
+    "smartcard": "^1.0.32"
   },
   "devDependencies": {
     "@nestjs/cli": "^6.9.0",
