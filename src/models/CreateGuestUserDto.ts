@@ -1,16 +1,24 @@
 import { GuestInfo } from "./GuestInfo";
-import { GuestAccesInfo } from "./GuestAccessInfo";
+import { GuestAccessInfo } from "./GuestAccessInfo";
 
 
 export interface CreateGuestUserDto {
-    id: string,
-    name: string,
-    description: string,
-    guestType: string,
-    sponsorUsername: string,
+    name: string, // resource name
+    id: string, // resource UUID
+    description?: string,
+    customFields?: Object // key value map
+    guestType?: string,
+    status?: string,
+    reasonForVisit: string,
+    personBeingVisited?: string,
+    sponsorUsername?: string,
+    sponsorUserId?: string,
+    statusReason?: string,
+    portalId: string,
+    guestAccessInfo?: GuestAccessInfo,
     guestInfo: GuestInfo,
-    guestAccessInfo: GuestAccesInfo,
-    customFields?: Object
+    
+    
 } 
 
 

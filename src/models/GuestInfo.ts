@@ -1,9 +1,15 @@
 export interface GuestInfo {
-    userName: string,
-    emailAddress: string,
-    phoneNumber: string,
-    enabled: boolean,
-    smsServiceProvider: string
+    enabled: boolean, // default false --> this field is only for get operation not applicable for create/update operations
+    password: string,
+    emailAddress?: string,
+    phoneNumber?: string,
+    smsServiceProvider?: string,
+    userName?: string,
+    firstName?: string,
+    lastName?:string,
+    company?: string,
+    creationTime?: string,
+    notificationLanguage?: string
 }
 
 
