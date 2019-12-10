@@ -4,21 +4,19 @@ import { GuestAccessInfo } from "./GuestAccessInfo";
 
 export interface CreateGuestUserDto {
     name: string, // resource name
-    id: string, // resource UUID
+    id: string, // resource UUID --> "guestuserId" for deletebyid
     description?: string,
     customFields?: Object // key value map
     guestType?: string,
     status?: string,
     reasonForVisit: string,
     personBeingVisited?: string,
-    sponsorUsername?: string,
+    sponsoSrUsername?: string,
     sponsorUserId?: string,
     statusReason?: string,
     portalId: string,
     guestAccessInfo?: GuestAccessInfo,
-    guestInfo: GuestInfo,
-    
-    
+    guestInfo: GuestInfo,  
 } 
 
 
