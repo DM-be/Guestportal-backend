@@ -9,12 +9,12 @@ export interface CreateGuestUserDto {
     customFields?: Object // key value map
     guestType?: string,
     status?: string,
-    reasonForVisit: string,
+    reasonForVisit?: string,
     personBeingVisited?: string,
-    sponsoSrUsername?: string,
+    sponsorUsername?: string,
     sponsorUserId?: string,
     statusReason?: string,
-    portalId: string,
+    portalId?: string,
     guestAccessInfo?: GuestAccessInfo,
     guestInfo: GuestInfo,  
 } 
