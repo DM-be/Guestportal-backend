@@ -7,7 +7,7 @@ import Axios, { AxiosResponse, AxiosError } from 'axios';
 @Injectable()
 export class IseService {
 
-    private BASE_URL = "https://x:9060/ers/config"
+    private BASE_URL =  "https://172.21.106.34:9060/ers/config"
 
 
     public async createISEGuestUser(createGuestUserDto: CreateGuestUserDto) {
