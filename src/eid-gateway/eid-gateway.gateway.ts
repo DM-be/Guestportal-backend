@@ -6,7 +6,7 @@ export class EidGateway {
 
     @WebSocketServer() server;
 
-    public async sendEidUser(eidUser: EidUser) {
+    public async emitEidUser(eidUser: EidUser) {
         this.server.emit('eidUser', eidUser);
     }
 

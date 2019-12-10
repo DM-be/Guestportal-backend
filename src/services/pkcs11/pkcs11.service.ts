@@ -12,31 +12,36 @@ import { EidGateway } from 'src/eid-gateway/eid-gateway.gateway';
 import { EidUser } from 'src/models/EidUser';
 import * as Devices from 'smartcard/lib/Devices';
 
-
+const FIRSTNAMES = 'firstnames';
+const SURNAME = 'surname';
+const DEVICE_ACTIVATED = 'device-activated';
+const CARD_INSERTED = 'card-inserted';
+const LIB = '/usr/lib/x86_64-linux-gnu/libbeidpkcs11.so.0'; // todo: get from environment (docker-compose)
 
 @Injectable()
 export class Pkcs11Service {
   private pkcs11: PKCS11;
   private devices: Devices;
-  private LIB = '/usr/lib/x86_64-linux-gnu/libbeidpkcs11.so.0'; // todo: get from environment (docker-compose)
 
   constructor(private readonly eidGateway: EidGateway) {
     this.pkcs11 = new PKCS11();
     this.devices = new Devices();
-    this.pkcs11.load(this.LIB);    
+    this.pkcs11.load(LIB);
     this.listenToEidCardEvents();
   }
 
-
   private listenToEidCardEvents() {
-    this.devices.on('device-activated', event => {
+    this.devices.on(DEVICE_ACTIVATED, event => {
       const device = event.device;
-      console.log(`Device: ${device} activated`)
-      device.on('card-inserted', async (ev) => {
-        // read here
-        await this.getEidUserFromReader()
-      })
-    })
+      device.on(CARD_INSERTED, async x => {
+        const eidUser: EidUser = this.readEidUser();
+        this.eidGateway.emitEidUser(eidUser);
+      });
+    });
+  }
+
+  private readEidUser(): EidUser {
+    return this.readObjects(this.openSession());
   }
 
   private openSession(): Buffer {
@@ -49,8 +54,8 @@ export class Pkcs11Service {
   private readObjects(session: Buffer): EidUser {
     let eidUser: EidUser = {
       firstNames: [],
-      surName: undefined
-    }
+      surName: undefined,
+    };
     this.pkcs11.C_FindObjectsInit(session, [
       { type: CKA_CLASS, value: CKO_DATA },
     ]);
@@ -62,33 +67,11 @@ export class Pkcs11Service {
       ]);
       if (attrs[0].value !== undefined && attrs[1].value !== undefined) {
         switch (attrs[0].value.toString()) {
-          case 'national_number':
-            break;
-          case 'firstnames':
-            console.log(eidUser);
-            console.log( attrs[1].value.toString())
+          case FIRSTNAMES:
             eidUser.firstNames = attrs[1].value.toString().split(' ');
             break;
-          case 'surname':
-            console.log(eidUser);
-
+          case SURNAME:
             eidUser.surName = attrs[1].value.toString();
-            break;
-          // case 'card_number':
-          //   console.log(attrs[1].value.toString());
-          //   break;
-          // case 'chip_number':
-          //   console.log(attrs[1].value.toString());
-          //   break;
-          // case 'gender':
-          //   console.log(attrs[1].value.toString());
-          //   break;
-          // case 'nationality':
-          //   console.log(attrs[1].value.toString());
-          //   break;
-          // case 'document_type':
-          //   console.log(attrs[1].value.toString());
-          //   break;
         }
       }
       hObject = this.pkcs11.C_FindObjects(session);
@@ -96,18 +79,5 @@ export class Pkcs11Service {
     this.pkcs11.C_CloseSession(session);
     this.pkcs11.C_Finalize();
     return eidUser;
-  }
-
-  private async getEidUserFromReader(): Promise<void> {
-    try {
-       await this.eidGateway.sendEidUser(this.readObjects(this.openSession()));
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-
-  public testSocket() {
-   /// this.eidGateway.sendEidData("test");
   }
 }
