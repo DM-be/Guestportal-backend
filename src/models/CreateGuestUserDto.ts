@@ -14,7 +14,7 @@ export interface CreateGuestUserDto {
     sponsorUsername?: string,
     sponsorUserId?: string,
     statusReason?: string,
-    portalId?: string,
+    portalId?: string, // needed to send email? 
     guestAccessInfo?: GuestAccessInfo,
     guestInfo: GuestInfo,  
 } 

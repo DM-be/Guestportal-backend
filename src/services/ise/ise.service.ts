@@ -36,4 +36,17 @@ export class IseService {
         }
     }
 
+    private async sendEmailWithCredentials(guestUserId: String, portalId: string) {
+        try {
+            const url = `${this.BASE_URL}/guestuser/email/${guestUserId}/portalId/${portalId}`;
+            await Axios.put(url);
+        } catch (error) {
+            const axiosError = error as AxiosError; // todo: handle other types of error
+            if (axiosError.response.status === 400)
+            {
+                console.log(`could not send guest email, error: ${axiosError.response.statusText}`)
+            } 
+        }
+    }
+
 }
