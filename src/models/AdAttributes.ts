@@ -1,5 +1,5 @@
-import { AdAttribute } from "./AdAttribute";
+import { AdAttribute } from './AdAttribute';
 
 export interface AdAttributes {
-    attributes: AdAttribute [];
+  attributes: AdAttribute[];
 }

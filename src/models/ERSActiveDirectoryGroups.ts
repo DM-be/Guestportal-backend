@@ -1,5 +1,5 @@
-import { ERSActiveDirectoryGroup } from "./ERSActiveDirectoryGroup";
+import { ERSActiveDirectoryGroup } from './ERSActiveDirectoryGroup';
 
 export interface ERSActiveDirectoryGroups {
-    groups: ERSActiveDirectoryGroup []
+  groups: ERSActiveDirectoryGroup[];
 }
