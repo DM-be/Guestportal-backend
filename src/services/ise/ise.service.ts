@@ -5,6 +5,9 @@ import { AxiosIseRequestHeader } from 'src/models/AxiosIseRequestHeader';
 import { AxiosIseAuth } from 'src/models/AxiosIseAuth';
 
 
+const PORTAL_ID = "f10871e0-7159-11e7-a355-005056aba474";
+const GUESTUSER = "identity.guestuser.2.0";
+
 @Injectable()
 export class IseService {
 
@@ -13,18 +16,12 @@ export class IseService {
         username: "portaluser",
         password: "Vergeten123!"
     };
-    
+    //todo: get values from vault in constructor/ docker-compose env
 
     public async createISEGuestUser(createGuestUserDto: CreateGuestUserDto): Promise<AxiosResponse> {
         try {
             const url = `${this.BASE_URL}/guestuser`;
-            const headers = new AxiosIseRequestHeader();
-            headers.setMediaType(headers.GUESTUSER);
-            const axiosRequestConfig: AxiosRequestConfig = {
-                auth: this.AXIOSISEAUTH,
-                headers
-            };
-            return await Axios.post(url, createGuestUserDto, axiosRequestConfig);
+            return await Axios.post(url, createGuestUserDto, this.generateAxiosRequestConfig(GUESTUSER));
         } catch (error) {
            const axiosError = error as AxiosError; // todo: handle other types of error
            if (axiosError.response.status === 400)
@@ -47,9 +44,9 @@ export class IseService {
         }
     }
 
-    private async sendEmailWithCredentials(guestUserId: String, portalId: string): Promise<AxiosResponse> {
+    private async sendEmailWithCredentials(guestUserId: String): Promise<AxiosResponse> {
         try {
-            const url = `${this.BASE_URL}/guestuser/email/${guestUserId}/portalId/${portalId}`;
+            const url = `${this.BASE_URL}/guestuser/email/${guestUserId}/portalId/${PORTAL_ID}`;
             return await Axios.put(url);
         } catch (error) {
             const axiosError = error as AxiosError; // todo: handle other types of error
@@ -58,6 +55,18 @@ export class IseService {
                 console.log(`could not send guest email, error: ${axiosError.response.statusText}`)
             } 
         }
+    }
+
+
+    private generateAxiosRequestConfig(mediatype: string): AxiosRequestConfig
+    {
+        const headers = new AxiosIseRequestHeader();
+        headers.setMediaType(mediatype);
+        const axiosRequestConfig: AxiosRequestConfig = {
+            auth: this.AXIOSISEAUTH,
+            headers
+        };
+        return axiosRequestConfig;
     }
 
 }
