@@ -8,10 +8,11 @@ import { IseService } from './services/ise/ise.service';
 import { UsersModule } from './users/users.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
+import { GuestUserService } from './services/guest-user/guest-user.service';
 
 @Module({
   imports: [EidGatewayModule, UsersModule, MongooseModule.forRoot('mongodb://localhost/authexample'), AuthModule],
   controllers: [AppController],
-  providers: [AppService, Pkcs11Service, EidGateway, IseService, UsersModule, AuthModule],
+  providers: [AppService, Pkcs11Service, EidGateway, IseService, UsersModule, AuthModule, GuestUserService],
 })
 export class AppModule {}
