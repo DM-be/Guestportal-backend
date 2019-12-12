@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { IseService } from '../ise/ise.service';
-import { Moment } from 'moment';
-
+import * as moment from 'moment';
 
 
 
@@ -22,9 +21,26 @@ export class GuestUserService {
 
     generateToAndFromDate(): Object
     {
-
-           
+      //  const currentDate = moment(moment().format()).add(1, 'D');
         
+    
+        const toDate = moment().add(this.VALID_DAYS, "day").format('MM/DD/YYYY HH:mm');
+        const fromDate = moment().format('MM/DD/YYYY HH:mm');
+
+
+        console.log(fromDate)
+
+
+        console.log(toDate)
+
+
+
+
+        /*
+
+              "fromDate" : "04/14/2020 16:49",
+      "toDate" : "04/19/2020 23:59",
+        */
 
         return {
             toDate: "",
