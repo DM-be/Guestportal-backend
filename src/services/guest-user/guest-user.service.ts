@@ -1,6 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { IseService } from '../ise/ise.service';
 import * as moment from 'moment';
+import { CreateGuestUserDto } from 'src/models/CreateGuestUserDto';
+import { GuestInfo } from 'src/models/GuestInfo';
+import { GuestUser } from 'src/models/GuestUser';
+import { IseGuestUserDto } from 'src/models/IseGuestUserDto';
+import { GuestAccessInfo } from 'src/models/GuestAccessInfo';
 
 
 
@@ -9,32 +14,49 @@ export class GuestUserService {
 
     private VALID_DAYS: number;
     
-
-
     constructor(private iseService: IseService)  {
         this.VALID_DAYS = 2;
     }
 
-    public createGuestUser() {
+    public async createGuestUser(createGuestUserDto: CreateGuestUserDto) {
+        const { password, firstName, surName , emailAddress} = createGuestUserDto;
+        const guestInfo: GuestInfo = {
+            firstName,
+            enabled: true, // check if required
+            password,
+            lastName: surName,
+            userName: emailAddress,
+        }
+        const guestUser: GuestUser = 
+        {
+            guestInfo, 
+            id: "11111", // todo: generate random id
+            name: "tesGuestUer",// todo: check reason for "name",
+            guestAccessInfo: this.generateGuestAccessInfo()
+        }
+        const iseGuestUserDto: IseGuestUserDto = {
+            GuestUser: guestUser
+        }
+        try {
+            await this.iseService.createISEGuestUser(iseGuestUserDto)
+        } catch (error) {
+         console.log(`could not create Ise guest user ${error}`);
+        }
 
     }
 
-    generateToAndFromDate(): Object
+    private generateGuestAccessInfo(): GuestAccessInfo
     {
-      //  const currentDate = moment(moment().format()).add(1, 'D');
-        
-    
+           
         const toDate = moment().add(this.VALID_DAYS, "day").format('MM/DD/YYYY HH:mm');
         const fromDate = moment().format('MM/DD/YYYY HH:mm');
 
-
-        console.log(fromDate)
-
-
-        console.log(toDate)
-
-
-
+        return {
+            toDate,
+            fromDate,
+            location: "Brussels",
+            validDays: this.VALID_DAYS
+        };
 
         /*
 
@@ -42,9 +64,5 @@ export class GuestUserService {
       "toDate" : "04/19/2020 23:59",
         */
 
-        return {
-            toDate: "",
-            fromDate: ""
-        }
     }
 }

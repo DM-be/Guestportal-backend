@@ -14,6 +14,6 @@ export interface GuestUser {
     sponsorUserId?: string;
     statusReason?: string;
     portalId?: string; // needed to send email?
-    guestAccessInfo?: GuestAccessInfo;
+    guestAccessInfo: GuestAccessInfo;
     guestInfo: GuestInfo;
 }
