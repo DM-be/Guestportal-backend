@@ -1,8 +1,8 @@
 export interface GuestAccessInfo {
   validDays: number; // Default -1 --> number of guest days user is valid
-  fromDate?: string;
-  toDate?: string;
-  location?: string;
+  fromDate: string;
+  toDate: string;
+  location: string;
   ssid?: string;
   groupTag?: string;
 }

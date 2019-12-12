@@ -7,57 +7,22 @@ export interface CreateGuestUserDto {
 }
 
 /*
-
 {
-
   "GuestUser" : {
-
-    "id" : "123456789",
-
-    "name" : "guestUser",
-
-    "description" : "ERS Example user ",
-
-    "guestType" : "Contractor",
-
-    "sponsorUserName" : "Mr Spons",
-
+    "guestType" : "Weekly (default)",
     "guestInfo" : {
-
-      "userName" : "DS3ewdsa34wWE",
-
-      "emailAddress" : "email@some.uri.com",
-
-      "phoneNumber" : "3211239034",
-
-      "password" : "asdlkj324ew",
-
-      "enabled" : true,
-
-      "smsServiceProvider" : "GLobal Default"
-
+      "userName" : "testGST01",
+      "firstName" : "John",
+      "lastName" : "Smith",
+      "password" : "9048"
     },
-
     "guestAccessInfo" : {
-
-      "validDays" : 90,
-
-      "fromDate" : "07/29/2014 14:44",
-
-      "toDate" : "10/29/2014 17:30",
-
+      "validDays" : 6,
+      "fromDate" : "04/14/2020 16:49",
+      "toDate" : "04/19/2020 23:59",
       "location" : "San Jose"
-
     },
-
-    "portalId" : "23423432523",
-
-    "customFields" : {
-
-      "another key" : "and its value",
-
-      "some key" : "some value"
-
-    }
-
-    */
+    "portalId" : "f10871e0-7159-11e7-a355-005056aba474"
+  }
+}
+   */
