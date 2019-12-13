@@ -3,6 +3,7 @@ import { IseGuestUserDto } from 'src/models/IseGuestUserDto';
 import Axios, { AxiosResponse, AxiosError, AxiosRequestConfig } from 'axios';
 import { AxiosIseRequestHeader } from 'src/models/AxiosIseRequestHeader';
 import { AxiosIseAuth } from 'src/models/AxiosIseAuth';
+import { ActiveDirectoryUser } from 'src/models/ActiveDirectoryUser';
 
 const PORTAL_ID = 'f10871e0-7159-11e7-a355-005056aba474';
 const GUESTUSER = 'identity.guestuser.2.0';
@@ -15,6 +16,22 @@ export class IseService {
     password: 'Vergeten123!',
   };
   //todo: get values from vault in constructor/ docker-compose env
+
+  private async sendEmailWithCredentials(
+    guestUserId: String,
+  ): Promise<AxiosResponse> {
+    try {
+      const url = `${this.BASE_URL}/guestuser/email/${guestUserId}/portalId/${PORTAL_ID}`;
+      return await Axios.put(url);
+    } catch (error) {
+      const axiosError = error as AxiosError; // todo: handle other types of error
+      if (axiosError.response.status === 400) {
+        console.log(
+          `could not send guest email, error: ${axiosError.response.statusText}`,
+        );
+      }
+    }
+  }
 
   public async createISEGuestUser(
     iseGuestUserDto: IseGuestUserDto,
@@ -50,20 +67,34 @@ export class IseService {
     }
   }
 
-  private async sendEmailWithCredentials(
-    guestUserId: String,
-  ): Promise<AxiosResponse> {
-    try {
-      const url = `${this.BASE_URL}/guestuser/email/${guestUserId}/portalId/${PORTAL_ID}`;
-      return await Axios.put(url);
-    } catch (error) {
-      const axiosError = error as AxiosError; // todo: handle other types of error
-      if (axiosError.response.status === 400) {
-        console.log(
-          `could not send guest email, error: ${axiosError.response.statusText}`,
-        );
-      }
-    }
+
+  // todo: implement API call 
+  public async getActiveDirectoryUsers(): Promise<ActiveDirectoryUser[]> {
+    return new Promise(resolve => {
+      resolve([
+        {
+          name: 'john smith',
+        },
+        {
+          name: 'test name',
+        },
+        {
+          name: 'test name',
+        },
+        {
+          name: 'test name',
+        },
+        {
+          name: 'test name',
+        },
+        {
+          name: 'test name',
+        },
+        {
+          name: 'test name',
+        },
+      ] as ActiveDirectoryUser[]);
+    });
   }
 
   private generateAxiosRequestConfig(mediatype: string): AxiosRequestConfig {
