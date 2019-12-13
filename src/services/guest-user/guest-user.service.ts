@@ -56,8 +56,8 @@ export class GuestUserService {
   private generateGuestAccessInfo(): GuestAccessInfo {
     const toDate = moment()
       .add(this.VALID_DAYS, 'day')
-      .format('MM/DD/YYYY HH:mm');
-    const fromDate = moment().format('MM/DD/YYYY HH:mm');
+      .format('DD/MM/YYYY HH:mm');
+    const fromDate = moment().format('DD/MM/YYYY HH:mm');
     return {
       toDate,
       fromDate,
