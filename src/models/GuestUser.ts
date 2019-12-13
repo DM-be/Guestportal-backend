@@ -6,14 +6,14 @@ export interface GuestUser {
     id: string; // resource UUID --> "guestuserId" for deletebyid
     description?: string;
     customFields?: Object; // key value map
-    guestType?: string;
+    guestType: string;
     status?: string;
     reasonForVisit?: string;
     personBeingVisited?: string;
     sponsorUsername?: string;
     sponsorUserId?: string;
     statusReason?: string;
-    portalId?: string; // needed to send email?
+    portalId: string; // needed to send email?
     guestAccessInfo: GuestAccessInfo;
     guestInfo: GuestInfo;
 }

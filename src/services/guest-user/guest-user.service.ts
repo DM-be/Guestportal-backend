@@ -42,6 +42,9 @@ export class GuestUserService {
       guestAccessInfo: this.generateGuestAccessInfo(),
       personBeingVisited,
       reasonForVisit,
+      portalId: "f10871e0-7159-11e7-a355-005056aba474",
+      guestType: "Weekly (default)"
+
     };
     const iseGuestUserDto: IseGuestUserDto = {
       GuestUser: guestUser,
@@ -49,6 +52,7 @@ export class GuestUserService {
     try {
       await this.iseService.createISEGuestUser(iseGuestUserDto);
     } catch (error) {
+      console.log(error);
       console.log(`could not create Ise guest user ${error}`);
     }
   }
@@ -56,13 +60,13 @@ export class GuestUserService {
   private generateGuestAccessInfo(): GuestAccessInfo {
     const toDate = moment()
       .add(this.VALID_DAYS, 'day')
-      .format('DD/MM/YYYY HH:mm');
-    const fromDate = moment().format('DD/MM/YYYY HH:mm');
+      .format('MM/DD/YYYY HH:mm');
+    const fromDate = moment().format('MM/DD/YYYY HH:mm');
     return {
       toDate,
       fromDate,
       location: LOCATION,
-      validDays: this.VALID_DAYS,
+      validDays: this.VALID_DAYS + 1,
     } as GuestAccessInfo;
   }
 }

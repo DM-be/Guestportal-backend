@@ -50,6 +50,7 @@ export class AppController {
   async addGuestUser(@Body() createGuestUserDto: CreateGuestUserDto)
   {
     try {
+      console.log(createGuestUserDto)
       await this.guestService.createGuestUser(createGuestUserDto);
       
     } catch (error) {
@@ -57,6 +58,23 @@ export class AppController {
       
     }
   }
+
+/*
+
+curl --header "Content-Type: application/json" \
+  --request POST \
+  --data ' { \
+    "username" : "dennis@test.com", \
+    "name" : "dennis-nameparam", \ 
+    "firstName" : "Dennis", \
+    "surName" : "Contractor", \ 
+    "password" : "5555",\
+    "reasonForVisit": "testvisitreason", \
+    "personBeingVisited": "tester" \
+  http:localhost:3000
+
+*/
+
 
 
 }

@@ -4,6 +4,7 @@ import Axios, { AxiosResponse, AxiosError, AxiosRequestConfig } from 'axios';
 import { AxiosIseRequestHeader } from 'src/models/AxiosIseRequestHeader';
 import { AxiosIseAuth } from 'src/models/AxiosIseAuth';
 import { ActiveDirectoryUser } from 'src/models/ActiveDirectoryUser';
+import  * as https from 'https';
 
 const PORTAL_ID = 'f10871e0-7159-11e7-a355-005056aba474';
 const GUESTUSER = 'identity.guestuser.2.0';
@@ -37,6 +38,7 @@ export class IseService {
     iseGuestUserDto: IseGuestUserDto,
   ): Promise<AxiosResponse> {
     try {
+      console.log(iseGuestUserDto)
       const url = `${this.BASE_URL}/guestuser`;
       return await Axios.post(
         url,
@@ -44,8 +46,10 @@ export class IseService {
         this.generateAxiosRequestConfig(GUESTUSER),
       );
     } catch (error) {
+      console.log(error)
       const axiosError = error as AxiosError; // todo: handle other types of error
       if (axiosError.response.status === 400) {
+        
         console.log(
           `could not create guest user, error: ${axiosError.response.statusText}`,
         );
@@ -99,10 +103,14 @@ export class IseService {
 
   private generateAxiosRequestConfig(mediatype: string): AxiosRequestConfig {
     const headers = new AxiosIseRequestHeader();
+    
     headers.setMediaType(mediatype);
     return {
       auth: this.AXIOSISEAUTH,
       headers,
+      httpsAgent: new https.Agent({
+        rejectUnauthorized: false
+      })
     } as AxiosRequestConfig;
   }
 }
