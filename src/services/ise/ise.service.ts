@@ -69,10 +69,9 @@ export class IseService {
   private generateAxiosRequestConfig(mediatype: string): AxiosRequestConfig {
     const headers = new AxiosIseRequestHeader();
     headers.setMediaType(mediatype);
-    const axiosRequestConfig: AxiosRequestConfig = {
+    return {
       auth: this.AXIOSISEAUTH,
       headers,
-    };
-    return axiosRequestConfig;
+    } as AxiosRequestConfig;
   }
 }

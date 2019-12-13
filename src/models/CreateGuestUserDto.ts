@@ -2,12 +2,14 @@
 // front end dto 
 
 export interface CreateGuestUserDto { // name? --> 
-    username: string;
+    username?: string; // email addresss as username?
     firstName: string; // multiple? --> first
     surName: string;
     emailAddress: string,
     password: string 
-    reasonOfVisit?: string;
-    visitee?: string;
+    reasonForVisit?: string;
+    personBeingVisited?: string;
+    
+    
 }
 
