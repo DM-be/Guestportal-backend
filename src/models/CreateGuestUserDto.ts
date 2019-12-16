@@ -8,7 +8,7 @@ export interface CreateGuestUserDto { // name? -->
     emailAddress: string,
     password: string 
     reasonForVisit?: string;
-    personBeingVisited?: string;
+    personBeingVisited?: string; // email address
     
     
 }
