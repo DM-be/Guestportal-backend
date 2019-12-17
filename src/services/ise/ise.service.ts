@@ -16,21 +16,17 @@ export class IseService {
     username: 'portaluser',
     password: 'Vergeten123!',
   };
-  //todo: get values from vault in constructor/ docker-compose env
+  //TODO: get values from vault in constructor/ docker-compose env
 
-  private async sendEmailWithCredentials(
+  public async sendEmailWithCredentials(
     guestUserId: String,
   ): Promise<AxiosResponse> {
     try {
       const url = `${this.BASE_URL}/guestuser/email/${guestUserId}/portalId/${PORTAL_ID}`;
       return await Axios.put(url);
     } catch (error) {
-      const axiosError = error as AxiosError; // todo: handle other types of error
-      if (axiosError.response.status === 400) {
-        console.log(
-          `could not send guest email, error: ${axiosError.response.statusText}`,
-        );
-      }
+      this.handleError(error, "could not send email to guestuser");
+      
     }
   }
 
@@ -46,14 +42,7 @@ export class IseService {
         this.generateAxiosRequestConfig(GUESTUSER),
       );
     } catch (error) {
-      console.log(error)
-      const axiosError = error as AxiosError; // todo: handle other types of error
-      if (axiosError.response.status === 400) {
-        
-        console.log(
-          `could not create guest user, error: ${axiosError.response.statusText}`,
-        );
-      }
+      this.handleError(error, "could not create create guestuser");
     }
   }
 
@@ -62,12 +51,7 @@ export class IseService {
       const url = `${this.BASE_URL}/guestuser/${guestUserId}`;
       return await Axios.delete(url); // 204
     } catch (error) {
-      const axiosError = error as AxiosError; // todo: handle other types of error
-      if (axiosError.response.status === 400) {
-        console.log(
-          `could not delete guest user, error: ${axiosError.response.statusText}`,
-        );
-      }
+      this.handleError(error, "could not create delete guestuser");
     }
   }
 
@@ -103,14 +87,25 @@ export class IseService {
 
   private generateAxiosRequestConfig(mediatype: string): AxiosRequestConfig {
     const headers = new AxiosIseRequestHeader();
-    
     headers.setMediaType(mediatype);
     return {
       auth: this.AXIOSISEAUTH,
       headers,
       httpsAgent: new https.Agent({
-        rejectUnauthorized: false
+        rejectUnauthorized: false //TODO: implement SSL certification etc. (this is for testing!)
       })
     } as AxiosRequestConfig;
+  }
+
+  private handleError(error: any, errorMessage:string) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response.status === 400) {
+      console.log(
+        `${errorMessage}; errorStatusText: ${axiosError.response.statusText}`,
+      );
+    }
+    else {
+      console.log(`unknown error occured ${error}`)
+    }
   }
 }
