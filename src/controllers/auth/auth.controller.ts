@@ -6,25 +6,19 @@ import { ApiTags, ApiOkResponse } from '@nestjs/swagger';
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
+  constructor(private authService: AuthService) {}
 
+  @ApiOkResponse({
+    description: 'Authenticated user successfully',
+  })
+  @Post()
+  async login(@Body() loginUserDto: LoginUserDto) {
+    let res = await this.authService.validateUserByPassword(loginUserDto);
+    console.log(res);
+    return res;
+  }
 
-    constructor(private authService: AuthService) {
-
-    }
-
-
-    @ApiOkResponse({
-        description: 'Authenticated user successfully',
-      })
-    @Post() 
-    async login(@Body() loginUserDto: LoginUserDto){
-        let res = await this.authService.validateUserByPassword(loginUserDto);
-        console.log(res);
-        return res;
-    }
-
-
-    /*
+  /*
 
       curl --header "Content-Type: application/json" \
   --request POST \

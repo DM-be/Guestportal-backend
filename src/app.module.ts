@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { Pkcs11Service } from './services/pkcs11/pkcs11.service';
 import { EidGatewayModule } from './eid-gateway/eid-gateway.module';
 import { EidGateway } from './eid-gateway/eid-gateway.gateway';
@@ -22,7 +21,6 @@ import { GuestUserController } from './controllers/guest-user/guest-user.control
   ],
   controllers: [AppController, AdController, GuestUserController],
   providers: [
-    AppService,
     Pkcs11Service,
     EidGateway,
     IseService,
