@@ -6,6 +6,9 @@ import { GuestInfo } from 'src/models/GuestInfo';
 import { GuestUser } from 'src/models/GuestUser';
 import { IseGuestUserDto } from 'src/models/IseGuestUserDto';
 import { GuestAccessInfo } from 'src/models/GuestAccessInfo';
+import { InjectModel } from '@nestjs/mongoose';
+import { GuestUserMongoose } from 'src/models/GuestUserMongoose';
+import { Model } from 'mongoose';
 
 const LOCATION = 'Brussels';
 const PORTAL_ID = 'f10871e0-7159-11e7-a355-005056aba474';
@@ -17,7 +20,10 @@ const DAY = 'day';
 export class GuestUserService {
   private VALID_DAYS: number;
 
-  constructor(private iseService: IseService) {
+  constructor(
+    private iseService: IseService,
+    @InjectModel('GuestUser') private guestUserModel: Model<GuestUserMongoose>,
+  ) {
     this.VALID_DAYS = 2;
   }
 
@@ -46,11 +52,28 @@ export class GuestUserService {
       GuestUser: guestUser,
     };
     try {
-      await this.iseService.createISEGuestUser(iseGuestUserDto);
+    //  await this.iseService.createISEGuestUser(iseGuestUserDto);
+      await this.saveGuestUserToMongodb(guestUser);
     } catch (error) {
       console.log(error);
       console.log(`could not create Ise guest user ${error}`);
     }
+  }
+
+  private async saveGuestUserToMongodb(guestUser: GuestUser) {
+    const { personBeingVisited } = guestUser;
+    const { fromDate, toDate } = guestUser.guestAccessInfo;
+    const { emailAddress, firstName, lastName } = guestUser.guestInfo;
+    const guestUserMongoose: GuestUserMongoose = {
+      emailAddress,
+      firstName,
+      lastName,
+      fromDate,
+      toDate,
+      personBeingVisited,
+    };
+    let createdGuestUser = new this.guestUserModel(guestUserMongoose);
+    return await createdGuestUser.save();
   }
 
   private generateGuestAccessInfo(): GuestAccessInfo {

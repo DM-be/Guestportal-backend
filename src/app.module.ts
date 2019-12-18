@@ -1,16 +1,16 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { Pkcs11Service } from './services/pkcs11/pkcs11.service';
-import { EidGatewayModule } from './eid-gateway/eid-gateway.module';
-import { EidGateway } from './eid-gateway/eid-gateway.gateway';
+import { EidGatewayModule } from './gateways/eid-gateway/eid-gateway.module';
+import { EidGateway } from './gateways/eid-gateway/eid-gateway.gateway';
 import { IseService } from './services/ise/ise.service';
 import { UsersModule } from './services/users/users.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './services/auth/auth.module';
-import { GuestUserService } from './services/guest-user/guest-user.service';
 import { ActiveDirectoryService } from './services/active-directory/active-directory.service';
 import { AdController } from './controllers/ad/ad.controller';
 import { GuestUserController } from './controllers/guest-user/guest-user.controller';
+import { GuestUserModule } from './services/guest-user/guest-user.module';
 
 @Module({
   imports: [
@@ -18,6 +18,7 @@ import { GuestUserController } from './controllers/guest-user/guest-user.control
     UsersModule,
     MongooseModule.forRoot('mongodb://localhost/authexample'),
     AuthModule,
+    GuestUserModule
   ],
   controllers: [AppController, AdController, GuestUserController],
   providers: [
@@ -26,7 +27,7 @@ import { GuestUserController } from './controllers/guest-user/guest-user.control
     IseService,
     UsersModule,
     AuthModule,
-    GuestUserService,
+    GuestUserModule,
     ActiveDirectoryService,
   ],
 })

@@ -13,7 +13,7 @@ export interface GuestUser {
     sponsorUsername?: string;
     sponsorUserId?: string;
     statusReason?: string;
-    portalId: string; // needed to send email?
+    portalId: string; 
     guestAccessInfo: GuestAccessInfo;
     guestInfo: GuestInfo;
 }
