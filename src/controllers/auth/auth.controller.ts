@@ -1,7 +1,9 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { LoginUserDto } from 'src/models/LoginUserDto.dto';
-import { AuthService } from './auth.service';
+import { AuthService } from '../../services/auth/auth.service';
+import { ApiTags, ApiOkResponse } from '@nestjs/swagger';
 
+@ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
 
@@ -11,6 +13,9 @@ export class AuthController {
     }
 
 
+    @ApiOkResponse({
+        description: 'Authenticated user successfully',
+      })
     @Post() 
     async login(@Body() loginUserDto: LoginUserDto){
         let res = await this.authService.validateUserByPassword(loginUserDto);
