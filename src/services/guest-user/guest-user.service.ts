@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { IseService } from '../ise/ise.service';
 import * as moment from 'moment';
-import { CreateGuestUserDto } from 'src/models/CreateGuestUserDto';
+import { CreateGuestUserDto } from 'src/models/CreateGuestUserDto.dto';
 import { GuestInfo } from 'src/models/GuestInfo';
 import { GuestUser } from 'src/models/GuestUser';
 import { IseGuestUserDto } from 'src/models/IseGuestUserDto';

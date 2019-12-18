@@ -27,6 +27,7 @@
     "@nestjs/passport": "^6.1.1",
     "@nestjs/platform-express": "^6.7.2",
     "@nestjs/platform-socket.io": "^6.10.8",
+    "@nestjs/swagger": "^4.0.9",
     "@nestjs/websockets": "^6.10.8",
     "axios": "^0.19.0",
     "bcrypt": "^3.0.7",
@@ -39,7 +40,8 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.0",
     "rxjs": "^6.5.3",
-    "smartcard": "^1.0.32"
+    "smartcard": "^1.0.32",
+    "swagger-ui-express": "^4.1.2"
   },
   "devDependencies": {
     "@nestjs/cli": "^6.9.0",

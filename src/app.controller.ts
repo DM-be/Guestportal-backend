@@ -5,7 +5,7 @@ import { IseService } from './services/ise/ise.service';
 import { GuestInfo } from './models/GuestInfo';
 import { GuestUser } from './models/GuestUser';
 import { GuestUserService } from './services/guest-user/guest-user.service';
-import { CreateGuestUserDto } from './models/CreateGuestUserDto';
+import { CreateGuestUserDto } from './models/CreateGuestUserDto.dto';
 
 @Controller()
 export class AppController {
