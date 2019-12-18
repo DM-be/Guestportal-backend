@@ -8,7 +8,7 @@ import {
   CKA_LABEL,
   CKA_VALUE,
 } from 'pkcs11js';
-import { EidGateway } from 'src/eid-gateway/eid-gateway.gateway';
+import { EidGateway } from 'src/gateways/eid-gateway/eid-gateway.gateway';
 import { EidUser } from 'src/models/EidUser';
 import * as Devices from 'smartcard/lib/Devices';
 
