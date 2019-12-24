@@ -16,7 +16,7 @@ import { GuestUserGateWayModule } from './gateways/guestUser-gateway/guest-user.
   imports: [
     EidGatewayModule,
     UsersModule,
-    MongooseModule.forRoot('mongodb://localhost/authexample'),
+    MongooseModule.forRoot('mongodb://localhost:27020/db?replicaSet=rs0',{ useNewUrlParser: true} ),
     AuthModule,
     GuestUserModule,
     GuestUserGateWayModule,

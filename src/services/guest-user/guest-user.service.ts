@@ -29,6 +29,7 @@ export class GuestUserService {
   ) {
     this.VALID_DAYS = 2;
     this.initGuestUsers$();
+    this.watchChangeStreamForDeletions();
   }
 
   public getGuestUsers$(): BehaviorSubject<GuestUserModel[]> {
@@ -38,9 +39,19 @@ export class GuestUserService {
   private async initGuestUsers$() {
     try {
       this.guestUsers$ = new BehaviorSubject(await this.getAllGuestUsers());
+      const users = await this.getAllGuestUsers();
+      console.log(users);
     } catch (error) {
       console.log(error);
     }
+  }
+
+  private async watchChangeStreamForDeletions() {
+    this.guestUserModel.watch().on('change', async changeEvent => {
+      if (changeEvent.operationType === 'delete') {
+        this.guestUsers$.next(await this.getAllGuestUsers());
+      }
+    });
   }
 
   public async createGuestUser(createGuestUserDto: CreateGuestUserDto) {
@@ -118,11 +129,9 @@ export class GuestUserService {
   }
 
   private async getAllGuestUsers(): Promise<GuestUserModel[]> {
-    let guestUsers: GuestUserModel[] = [];
-    this.guestUserModel.find({}, (err, docs) => {
-      guestUsers = docs as GuestUserModel[];
+    return this.guestUserModel.find({}, (err, docs) => {
+      return docs as GuestUserModel[];
     });
-    return guestUsers;
   }
 
   private async saveGuestUserModelToMongodb(
@@ -155,6 +164,9 @@ export class GuestUserService {
         fromDate,
         toDate,
         personBeingVisited,
+        expire: moment()
+          .add(1, 'm')
+          .toDate(),
       } as GuestUserModel;
     } catch (error) {}
   }
