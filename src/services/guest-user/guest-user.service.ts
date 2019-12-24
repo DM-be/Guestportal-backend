@@ -7,9 +7,10 @@ import { GuestUser } from 'src/models/GuestUser';
 import { IseGuestUserDto } from 'src/models/IseGuestUserDto';
 import { GuestAccessInfo } from 'src/models/GuestAccessInfo';
 import { InjectModel } from '@nestjs/mongoose';
-import { GuestUserMongoose } from 'src/models/GuestUserMongoose';
+import { GuestUserModel } from 'src/models/GuestUserModel';
 import { Model } from 'mongoose';
 import { BehaviorSubject } from 'rxjs';
+import { RemoveGuestUserDto } from 'src/models/RemoveGuestUserDto';
 
 const LOCATION = 'Brussels';
 const PORTAL_ID = 'f10871e0-7159-11e7-a355-005056aba474';
@@ -20,14 +21,18 @@ const DAY = 'day';
 @Injectable()
 export class GuestUserService {
   private VALID_DAYS: number;
-  public guestUsers$: BehaviorSubject<GuestUserMongoose[]>;
+  private guestUsers$: BehaviorSubject<GuestUserModel[]>;
 
   constructor(
     private iseService: IseService,
-    @InjectModel('GuestUser') private guestUserModel: Model<GuestUserMongoose>,
+    @InjectModel('GuestUser') private guestUserModel: Model<GuestUserModel>,
   ) {
     this.VALID_DAYS = 2;
     this.initGuestUsers$();
+  }
+
+  public getGuestUsers$(): BehaviorSubject<GuestUserModel[]> {
+    return this.guestUsers$;
   }
 
   private async initGuestUsers$() {
@@ -64,11 +69,10 @@ export class GuestUserService {
     };
     try {
       //  await this.iseService.createISEGuestUser(iseGuestUserDto);
-      const guestUserMongoose = this.createGuestUserMongoose(guestUser);
-      const guestUserModel = await this.createGuestUserModel(guestUserMongoose);
-      this.saveGuestUserModelToMongodb(guestUserModel);
+      const guestUserModel = this.createGuestUserModel(guestUser);
+      await this.saveGuestUserModelToMongodb(guestUserModel);
       this.guestUsers$.next(
-        this.addGuestUserModelToGuestUsers$(guestUserMongoose),
+        this.addGuestUserModelToGuestUsers$(guestUserModel),
       );
     } catch (error) {
       console.log(error);
@@ -76,43 +80,70 @@ export class GuestUserService {
     }
   }
 
-  private addGuestUserModelToGuestUsers$(
-    guestUserMongoose: GuestUserMongoose,
-  ): GuestUserMongoose[] {
+  public async removeGuestUser(removeGuestUserDto: RemoveGuestUserDto) {
     try {
-      const guestUserModels = this.guestUsers$.value;
-      guestUserModels.push(guestUserMongoose);
-      return guestUserModels;
+      //await this.iseService.deleteISEGuestUser(removeGuestUserDto.emailAddress);
+      await this.removeGuestUserModelFromGuestUsers$(
+        removeGuestUserDto.emailAddress,
+      );
+      await this.deleteGuestUserModelFromMongodb(
+        removeGuestUserDto.emailAddress,
+      );
     } catch (error) {}
   }
 
-  private removeGuestUserModelFromGuestUsers$(
-    guestUserMongoose: GuestUserMongoose,
-  ) {
-    // implement
-  }
-
-  private async getAllGuestUsers(): Promise<GuestUserMongoose[]> {
-    let guestUsers: GuestUserMongoose[] = [];
-    this.guestUserModel.find({}, (err, docs) => {
-      guestUsers = docs as GuestUserMongoose[];
-    });
-    return guestUsers;
-  }
-
-  // refactor
-
-  private async saveGuestUserModelToMongodb(
-    guestUserModel: Model<GuestUserMongoose>,
-  ): Promise<void> {
+  private addGuestUserModelToGuestUsers$(
+    guestUserModel: GuestUserModel,
+  ): GuestUserModel[] {
     try {
-      await guestUserModel.save();
+      const guestUserModels = this.guestUsers$.getValue();
+      guestUserModels.push(guestUserModel);
+      return guestUserModels;
     } catch (error) {
       console.log(error);
     }
   }
 
-  private createGuestUserMongoose(guestUser: GuestUser): GuestUserMongoose {
+  private removeGuestUserModelFromGuestUsers$(emailAddress: string) {
+    try {
+      const guestUserModels = this.guestUsers$.getValue();
+      const i = guestUserModels.findIndex(
+        gu => gu.emailAddress === emailAddress,
+      );
+      guestUserModels.splice(i, 1);
+      return guestUserModels;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  private async getAllGuestUsers(): Promise<GuestUserModel[]> {
+    let guestUsers: GuestUserModel[] = [];
+    this.guestUserModel.find({}, (err, docs) => {
+      guestUsers = docs as GuestUserModel[];
+    });
+    return guestUsers;
+  }
+
+  private async saveGuestUserModelToMongodb(
+    guestUserModel: GuestUserModel,
+  ): Promise<void> {
+    try {
+      await new this.guestUserModel(guestUserModel).save();
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  private async deleteGuestUserModelFromMongodb(
+    emailAddress: string,
+  ): Promise<void> {
+    try {
+      await this.guestUserModel.deleteOne({ emailAddress });
+    } catch (error) {}
+  }
+
+  private createGuestUserModel(guestUser: GuestUser): GuestUserModel {
     try {
       const { personBeingVisited } = guestUser;
       const { fromDate, toDate } = guestUser.guestAccessInfo;
@@ -124,18 +155,8 @@ export class GuestUserService {
         fromDate,
         toDate,
         personBeingVisited,
-      } as GuestUserMongoose;
+      } as GuestUserModel;
     } catch (error) {}
-  }
-
-  private async createGuestUserModel(
-    guestUserMongoose: GuestUserMongoose,
-  ): Promise<Model<GuestUserMongoose>> {
-    try {
-      return new this.guestUserModel(guestUserMongoose);
-    } catch (error) {
-      console.log(error);
-    }
   }
 
   private generateGuestAccessInfo(): GuestAccessInfo {
@@ -176,8 +197,8 @@ export class GuestUserService {
   ): GuestUser {
     const guestUser: GuestUser = {
       guestInfo,
-      id: '11111', // TODO: implement ID generator (name, email,??)
-      name: 'tesGuestUer', // TODO: check reasoning for name property, still needed?
+      id: guestInfo.emailAddress, // TODO: implement ID generator (name, email,??)
+      name: `${guestInfo.firstName} {${guestInfo.lastName}}`, // TODO: check reasoning for name property, still needed?
       guestAccessInfo: this.generateGuestAccessInfo(),
       personBeingVisited,
       reasonForVisit,

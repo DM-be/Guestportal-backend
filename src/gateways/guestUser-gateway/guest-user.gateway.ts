@@ -16,7 +16,7 @@ export class GuestUserGateWay {
 
   constructor(private guestUserService: GuestUserService) {}
 
-  @UseGuards(AuthGuard())
+ // @UseGuards(AuthGuard())
   @SubscribeMessage('removeUser')
   private async removeGuestUser(client: Socket, removeGuestUserDto: RemoveGuestUserDto) {
     try {

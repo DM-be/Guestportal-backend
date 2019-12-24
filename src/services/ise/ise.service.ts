@@ -4,7 +4,7 @@ import Axios, { AxiosResponse, AxiosError, AxiosRequestConfig } from 'axios';
 import { AxiosIseRequestHeader } from 'src/models/AxiosIseRequestHeader';
 import { AxiosIseAuth } from 'src/models/AxiosIseAuth';
 import { ActiveDirectoryUser } from 'src/models/ActiveDirectoryUser';
-import  * as https from 'https';
+import * as https from 'https';
 
 const PORTAL_ID = 'f10871e0-7159-11e7-a355-005056aba474';
 const GUESTUSER = 'identity.guestuser.2.0';
@@ -25,8 +25,7 @@ export class IseService {
       const url = `${this.BASE_URL}/guestuser/email/${guestUserId}/portalId/${PORTAL_ID}`;
       return await Axios.put(url);
     } catch (error) {
-      this.handleError(error, "could not send email to guestuser");
-      
+      this.handleError(error, 'could not send email to guestuser');
     }
   }
 
@@ -34,7 +33,7 @@ export class IseService {
     iseGuestUserDto: IseGuestUserDto,
   ): Promise<AxiosResponse> {
     try {
-      console.log(iseGuestUserDto)
+      console.log(iseGuestUserDto);
       const url = `${this.BASE_URL}/guestuser`;
       return await Axios.post(
         url,
@@ -42,21 +41,22 @@ export class IseService {
         this.generateAxiosRequestConfig(GUESTUSER),
       );
     } catch (error) {
-      this.handleError(error, "could not create create guestuser");
+      this.handleError(error, 'could not create create guestuser');
     }
   }
 
-  public async deleteISEGuestUser(guestUserId: string): Promise<AxiosResponse> {
+  public async deleteISEGuestUser(
+    guestUserEmailAsId: string,
+  ): Promise<AxiosResponse> {
     try {
-      const url = `${this.BASE_URL}/guestuser/${guestUserId}`;
+      const url = `${this.BASE_URL}/guestuser/${guestUserEmailAsId}`;
       return await Axios.delete(url); // 204
     } catch (error) {
-      this.handleError(error, "could not create delete guestuser");
+      this.handleError(error, 'could not create delete guestuser');
     }
   }
 
-
-  // todo: implement API call 
+  // todo: implement API call
   public async getActiveDirectoryUsers(): Promise<ActiveDirectoryUser[]> {
     return new Promise(resolve => {
       resolve([
@@ -92,20 +92,19 @@ export class IseService {
       auth: this.AXIOSISEAUTH,
       headers,
       httpsAgent: new https.Agent({
-        rejectUnauthorized: false //TODO: implement SSL certification etc. (this is for testing!)
-      })
+        rejectUnauthorized: false, //TODO: implement SSL certification etc. (this is for testing!)
+      }),
     } as AxiosRequestConfig;
   }
 
-  private handleError(error: any, errorMessage:string) {
+  private handleError(error: any, errorMessage: string) {
     const axiosError = error as AxiosError;
     if (axiosError.response.status === 400) {
       console.log(
         `${errorMessage}; errorStatusText: ${axiosError.response.statusText}`,
       );
-    }
-    else {
-      console.log(`unknown error occured ${error}`)
+    } else {
+      console.log(`unknown error occured ${error}`);
     }
   }
 }

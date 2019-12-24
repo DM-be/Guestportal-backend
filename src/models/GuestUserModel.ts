@@ -1,4 +1,4 @@
-export interface GuestUserMongoose {
+export interface GuestUserModel {
     firstName: string;
     lastName: string;
     fromDate: string;
