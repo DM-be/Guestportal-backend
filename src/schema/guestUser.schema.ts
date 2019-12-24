@@ -24,6 +24,7 @@ export const GuestUserSchema = new mongoose.Schema({
   emailAddress: {
     type: String,
     required: true,
+    unique: true,
   },
   expire: { type: Date, index: { expireAfterSeconds: 0 } },
 });
