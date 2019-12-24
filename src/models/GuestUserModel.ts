@@ -5,4 +5,5 @@ export interface GuestUserModel {
     toDate: string;
     personBeingVisited: string;
     emailAddress: string;
+    expire: Date;
 }

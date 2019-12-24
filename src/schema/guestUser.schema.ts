@@ -25,4 +25,5 @@ export const GuestUserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  expire: { type: Date, index: { expireAfterSeconds: 0 } },
 });
