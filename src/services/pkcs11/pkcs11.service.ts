@@ -9,7 +9,7 @@ import {
   CKA_VALUE,
 } from 'pkcs11js';
 import { EidGateway } from 'src/gateways/eid-gateway/eid-gateway.gateway';
-import { EidUser } from 'src/models/EidUser';
+import { EidUserDto } from 'src/models/EidUserDto';
 import * as Devices from 'smartcard/lib/Devices';
 
 const FIRSTNAMES = 'firstnames';
@@ -34,13 +34,13 @@ export class Pkcs11Service {
     this.devices.on(DEVICE_ACTIVATED, event => {
       const device = event.device;
       device.on(CARD_INSERTED, async x => {
-        const eidUser: EidUser = this.readEidUser();
+        const eidUser: EidUserDto = this.readEidUser();
         this.eidGateway.emitEidUser(eidUser);
       });
     });
   }
 
-  private readEidUser(): EidUser {
+  private readEidUser(): EidUserDto {
     return this.readObjects(this.openSession());
   }
 
@@ -51,8 +51,8 @@ export class Pkcs11Service {
     return this.pkcs11.C_OpenSession(slot, CKF_RW_SESSION | CKF_SERIAL_SESSION);
   }
 
-  private readObjects(session: Buffer): EidUser {
-    let eidUser: EidUser = {
+  private readObjects(session: Buffer): EidUserDto {
+    let eidUser: EidUserDto = {
       firstNames: [],
       surName: undefined,
     };
