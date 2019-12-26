@@ -8,7 +8,11 @@ import { GuestUserService } from 'src/services/guest-user/guest-user.service';
 import { Socket } from 'dgram';
 import { RemoveGuestUserDto } from 'src/models/RemoveGuestUserDto';
 
-@WebSocketGateway()
+
+const ALLOWED_ORIGINS = 'localhost:*'
+
+
+@WebSocketGateway(3001, { origin: ALLOWED_ORIGINS})
 export class EidGateway {
   @WebSocketServer() server;
 

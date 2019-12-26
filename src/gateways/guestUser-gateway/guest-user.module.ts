@@ -2,12 +2,14 @@ import { Module } from '@nestjs/common';
 import { GuestUserGateWay } from './guest-user.gateway';
 import { PassportModule } from '@nestjs/passport';
 import { GuestUserModule } from 'src/services/guest-user/guest-user.module';
+import { AuthModule } from 'src/services/auth/auth.module';
 
 @Module({
-  providers: [GuestUserGateWay],
+  providers: [GuestUserGateWay, AuthModule],
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt', session: false }),
-    GuestUserModule
+    GuestUserModule,
+    AuthModule
   ],
   exports: [GuestUserGateWay]
 })
