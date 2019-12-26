@@ -16,7 +16,7 @@ import { TokenResponse } from 'src/models/TokenResponse';
 
 const ALLOWED_ORIGINS = 'localhost:4200';
 
-@WebSocketGateway(3002)
+@WebSocketGateway(3002, { origin: ALLOWED_ORIGINS })
 export class GuestUserGateWay implements OnGatewayConnection {
   @WebSocketServer() server;
 
@@ -43,10 +43,7 @@ export class GuestUserGateWay implements OnGatewayConnection {
 
   @UseGuards(AuthGuard())
   @SubscribeMessage('removeUser')
-  private async removeGuestUser(
-    client: Socket,
-    removeGuestUserDto: RemoveGuestUserDto,
-  ) {
+  private async removeGuestUser(removeGuestUserDto: RemoveGuestUserDto) {
     try {
       console.log('removing....');
       await this.guestUserService.removeGuestUser(removeGuestUserDto);

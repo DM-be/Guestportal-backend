@@ -1,15 +1,12 @@
 import {
   WebSocketGateway,
   WebSocketServer,
-  SubscribeMessage,
 } from '@nestjs/websockets';
 import { EidUserDto } from 'src/models/EidUserDto';
-import { GuestUserService } from 'src/services/guest-user/guest-user.service';
-import { Socket } from 'dgram';
-import { RemoveGuestUserDto } from 'src/models/RemoveGuestUserDto';
 
 
-const ALLOWED_ORIGINS = 'localhost:*'
+
+const ALLOWED_ORIGINS = 'localhost:4200'
 
 
 @WebSocketGateway(3001, { origin: ALLOWED_ORIGINS})
