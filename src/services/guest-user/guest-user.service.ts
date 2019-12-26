@@ -21,12 +21,12 @@ const DAY = 'day';
 @Injectable()
 export class GuestUserService {
   private VALID_DAYS: number;
-  private guestUsers$: BehaviorSubject<GuestUserModel[]>;
-
+  public guestUsers$: BehaviorSubject<GuestUserModel[]>;
   constructor(
     private iseService: IseService,
     @InjectModel('GuestUser') private guestUserModel: Model<GuestUserModel>,
   ) {
+    this.guestUsers$ = new BehaviorSubject([]);
     this.VALID_DAYS = 2;
     this.initGuestUsers$();
     this.watchChangeStreamForDeletions();
@@ -164,7 +164,7 @@ export class GuestUserService {
         fromDate,
         toDate,
         personBeingVisited,
-        expire: moment()
+        expire: moment() //TODO: remove test --> date with todate
           .add(1, 'm')
           .toDate(),
       } as GuestUserModel;
