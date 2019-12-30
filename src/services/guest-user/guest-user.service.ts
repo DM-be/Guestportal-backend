@@ -38,7 +38,7 @@ export class GuestUserService {
 
   private async initializeGuestUsers$() {
     try {
-      this.guestUsers$ = new BehaviorSubject([]);
+      this.guestUsers$ = new BehaviorSubject(undefined);
       this.guestUsers$.next(await this.getAllGuestUsers());
     } catch (error) {
       console.log(error);
@@ -48,7 +48,7 @@ export class GuestUserService {
   private async watchChangeStreamForDeletions() {
     this.guestUserModel.watch().on('change', async changeEvent => {
       if (changeEvent.operationType === 'delete') {
-        console.log('deleted one')
+        console.log('deleted one');
         this.guestUsers$.next(await this.getAllGuestUsers());
       }
     });
@@ -94,11 +94,14 @@ export class GuestUserService {
   public async removeGuestUser(removeGuestUserDto: RemoveGuestUserDto) {
     try {
       //await this.iseService.deleteISEGuestUser(removeGuestUserDto.emailAddress);
-      await this.removeGuestUserModelFromGuestUsers$(
-        removeGuestUserDto.emailAddress,
-      );
+
       await this.deleteGuestUserModelFromMongodb(
         removeGuestUserDto.emailAddress,
+      );
+      this.guestUsers$.next(
+        await this.removeGuestUserModelFromGuestUsers$(
+          removeGuestUserDto.emailAddress,
+        ),
       );
     } catch (error) {}
   }
