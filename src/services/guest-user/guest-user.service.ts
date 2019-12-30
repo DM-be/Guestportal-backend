@@ -28,7 +28,7 @@ export class GuestUserService {
   ) {
     this.guestUsers$ = new BehaviorSubject([]);
     this.VALID_DAYS = 2;
-    this.initGuestUsers$();
+    this.initializeGuestUsers$();
     this.watchChangeStreamForDeletions();
   }
 
@@ -36,11 +36,10 @@ export class GuestUserService {
     return this.guestUsers$;
   }
 
-  private async initGuestUsers$() {
+  private async initializeGuestUsers$() {
     try {
-      this.guestUsers$ = new BehaviorSubject(await this.getAllGuestUsers());
-      const users = await this.getAllGuestUsers();
-      console.log(users);
+      this.guestUsers$ = new BehaviorSubject([]);
+      this.guestUsers$.next(await this.getAllGuestUsers());
     } catch (error) {
       console.log(error);
     }
@@ -49,6 +48,7 @@ export class GuestUserService {
   private async watchChangeStreamForDeletions() {
     this.guestUserModel.watch().on('change', async changeEvent => {
       if (changeEvent.operationType === 'delete') {
+        console.log('deleted one')
         this.guestUsers$.next(await this.getAllGuestUsers());
       }
     });
@@ -108,6 +108,7 @@ export class GuestUserService {
   ): GuestUserModel[] {
     try {
       const guestUserModels = this.guestUsers$.getValue();
+      console.log('add');
       guestUserModels.push(guestUserModel);
       return guestUserModels;
     } catch (error) {
@@ -129,7 +130,7 @@ export class GuestUserService {
   }
 
   private async getAllGuestUsers(): Promise<GuestUserModel[]> {
-    return this.guestUserModel.find({}, (err, docs) => {
+    return await this.guestUserModel.find({}, (err, docs) => {
       return docs as GuestUserModel[];
     });
   }
