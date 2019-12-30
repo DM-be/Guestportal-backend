@@ -1,15 +1,10 @@
-import {
-  WebSocketGateway,
-  WebSocketServer,
-} from '@nestjs/websockets';
+import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { EidUserDto } from 'src/models/EidUserDto';
 
+const ALLOWED_ORIGINS = 'localhost:4200';
+const READ_CARD_EVENT = 'readCardDataEvent';
 
-
-const ALLOWED_ORIGINS = 'localhost:4200'
-
-
-@WebSocketGateway(3001, { origin: ALLOWED_ORIGINS})
+@WebSocketGateway(3001, { origin: ALLOWED_ORIGINS })
 export class EidGateway {
   @WebSocketServer() server;
 
@@ -17,7 +12,7 @@ export class EidGateway {
 
   public async emitEidUser(EidUserDto: EidUserDto): Promise<void> {
     try {
-      await this.server.emit('readCardDataEvent', EidUserDto);
+      await this.server.emit(READ_CARD_EVENT, EidUserDto);
     } catch (error) {
       console.log(`failed to emit EidUser:  ${error}`);
     }

@@ -28,39 +28,39 @@ export class GuestUserGateWay implements OnGatewayConnection {
   }
 
   async handleConnection(client: Socket) {
-    const token = client.handshake.query.token;
-    const jwtPayload: JwtPayload = <JwtPayload>jwt.verify(token, 'secretkey'); //TODO: get secretkey from env
-    try {
-      const refreshedToken: TokenResponse = await this.authService.validateUserByJwt(
-        jwtPayload,
-      );
-      this.refreshClientToken(refreshedToken);
-    } catch (error) {
-      console.log('token not valid');
-      client.disconnect();
-    }
+    console.log(client.handshake.query.token);
+    // const token = client.handshake.query.token;
+    // const jwtPayload: JwtPayload = <JwtPayload>jwt.verify(token, 'secretkey'); //TODO: get secretkey from env
+    // try {
+    //   const refreshedToken: TokenResponse = await this.authService.validateUserByJwt(
+    //     jwtPayload,
+    //   );
+    //   await this.refreshClientToken(refreshedToken);
+    // } catch (error) {
+    //   console.log('token not valid');
+    //   client.disconnect();
+    // }
   }
 
-  @UseGuards(AuthGuard())
+  // @UseGuards(AuthGuard())
   @SubscribeMessage('removeUser')
   private async removeGuestUser(removeGuestUserDto: RemoveGuestUserDto) {
     try {
       console.log('removing....');
-      await this.guestUserService.removeGuestUser(removeGuestUserDto);
+      // await this.guestUserService.removeGuestUser(removeGuestUserDto);
     } catch (error) {}
   }
 
-  public async subscribeToGuestUserDatabaseChanges() {
-    this.guestUserService.guestUsers$.subscribe(guestUserModelArray => {
-      if (guestUserModelArray.length > 0) {
-        console.log('dbchange');
-        console.log(guestUserModelArray);
-        this.server.emit('guestUserDatabaseChange', guestUserModelArray);
+  private async subscribeToGuestUserDatabaseChanges() {
+    this.guestUserService.guestUsers$.subscribe(async guestUserModelArray => {
+      if (guestUserModelArray) {
+        await this.server.emit('guestUserDatabaseChange', guestUserModelArray);
       }
     });
   }
 
-  public async refreshClientToken(tokenResponse: TokenResponse) {
+  @UseGuards(AuthGuard())
+  private async refreshClientToken(tokenResponse: TokenResponse) {
     try {
       await this.server.emit('refreshToken', tokenResponse);
     } catch (error) {
