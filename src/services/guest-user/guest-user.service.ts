@@ -12,6 +12,7 @@ import { Model } from 'mongoose';
 import { BehaviorSubject } from 'rxjs';
 import { RemoveGuestUserDto } from 'src/models/RemoveGuestUserDto';
 
+//TODO: move to env
 const LOCATION = 'Brussels';
 const PORTAL_ID = 'f10871e0-7159-11e7-a355-005056aba474';
 const GUEST_TYPE = 'Weekly (default)'; // TODO: check guest type
@@ -19,9 +20,37 @@ const MOMENT_FORMAT = 'MM/DD/YYYY HH:mm';
 const DAY = 'day';
 
 @Injectable()
+/**
+ * service responsible for creating guest users, removing them and notifying database changes.
+ * Communicates with the IseService to send the requests to the ISE API.
+ *
+ * @export
+ * @class GuestUserService
+ */
 export class GuestUserService {
+  /**
+   *
+   * The number of days a user is allowed guest access in ISE.
+   * @private
+   * @type {number}
+   * @memberof GuestUserService
+   */
   private VALID_DAYS: number;
+
+  /**
+   * The subject containing an array of guest users. Emits all changes as a full new array of guest users.
+   *
+   * @type {BehaviorSubject<GuestUserModel[]>}
+   * @memberof GuestUserService
+   */
   public guestUsers$: BehaviorSubject<GuestUserModel[]>;
+
+  /**
+   *Creates an instance of GuestUserService.
+   * @param {IseService} iseService IseService to communicate directly using exposed public functions for removing, deleting,...
+   * @param {Model<GuestUserModel>} guestUserModel reference to the guest user model used by mongoose
+   * @memberof GuestUserService
+   */
   constructor(
     private iseService: IseService,
     @InjectModel('GuestUser') private guestUserModel: Model<GuestUserModel>,
@@ -32,29 +61,18 @@ export class GuestUserService {
     this.watchChangeStreamForDeletions();
   }
 
-  public getGuestUsers$(): BehaviorSubject<GuestUserModel[]> {
-    return this.guestUsers$;
-  }
-
-  private async initializeGuestUsers$() {
-    try {
-      this.guestUsers$ = new BehaviorSubject(undefined);
-      this.guestUsers$.next(await this.getAllGuestUsers());
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  private async watchChangeStreamForDeletions() {
-    this.guestUserModel.watch().on('change', async changeEvent => {
-      if (changeEvent.operationType === 'delete') {
-        console.log('deleted one');
-        this.guestUsers$.next(await this.getAllGuestUsers());
-      }
-    });
-  }
-
-  public async createGuestUser(createGuestUserDto: CreateGuestUserDto) {
+  /**
+   * Public exposed function used by the guest user controller.
+   * Uses the CreateGuestUserDto object to generate the IseGuestUserDto object for communication with the ISE API.
+   * Creates a guestUsermodel
+   *
+   * @param {CreateGuestUserDto} createGuestUserDto
+   * @returns {Promise<void>}
+   * @memberof GuestUserService
+   */
+  public async createGuestUser(
+    createGuestUserDto: CreateGuestUserDto,
+  ): Promise<void> {
     const {
       password,
       firstName,
@@ -83,7 +101,7 @@ export class GuestUserService {
       const guestUserModel = this.createGuestUserModel(guestUser);
       await this.saveGuestUserModelToMongodb(guestUserModel);
       this.guestUsers$.next(
-        this.addGuestUserModelToGuestUsers$(guestUserModel),
+        this.addGuestUserModelToGuestUsers$Value(guestUserModel),
       );
     } catch (error) {
       console.log(error);
@@ -91,22 +109,69 @@ export class GuestUserService {
     }
   }
 
+  /**
+   * Public exposed function used by the guest user controller.
+   * Removes a guest user from the guest user mongodb and the ISE api.
+   * Emits the value of the modified subject after removing the user sucessfully
+   *
+   * @param {RemoveGuestUserDto} removeGuestUserDto
+   * @memberof GuestUserService
+   */
   public async removeGuestUser(removeGuestUserDto: RemoveGuestUserDto) {
     try {
       //await this.iseService.deleteISEGuestUser(removeGuestUserDto.emailAddress);
-
       await this.deleteGuestUserModelFromMongodb(
         removeGuestUserDto.emailAddress,
       );
       this.guestUsers$.next(
-        await this.removeGuestUserModelFromGuestUsers$(
+        await this.removeGuestUserModelFromGuestUsers$Value(
           removeGuestUserDto.emailAddress,
         ),
       );
     } catch (error) {}
   }
 
-  private addGuestUserModelToGuestUsers$(
+  /**
+   * initializes the guestUsers$ subject
+   * emits its first value as all current guest users in the mongodb.
+   *
+   * @private
+   * @memberof GuestUserService
+   */
+  private async initializeGuestUsers$() {
+    try {
+      this.guestUsers$ = new BehaviorSubject(undefined);
+      this.guestUsers$.next(await this.getAllGuestUserModelsFromdb());
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  /**
+   *
+   * listens to database changes, when a record is auto deleted it will emit the full guest users database, excluding the deleted record.
+   *
+   * @private
+   * @memberof GuestUserService
+   */
+  private async watchChangeStreamForDeletions() {
+    this.guestUserModel.watch().on('change', async changeEvent => {
+      if (changeEvent.operationType === 'delete') {
+        this.guestUsers$.next(await this.getAllGuestUserModelsFromdb());
+      }
+    });
+  }
+
+  /**
+   * Adds a GuestUserModel using the current value of the guestUser$ subject.
+   * Returns the modified array after adding the model.
+   *
+   * @private
+   * @param {GuestUserModel} guestUserModel
+   * @returns {GuestUserModel[]}
+   * @memberof GuestUserService
+   */
+  private addGuestUserModelToGuestUsers$Value(
     guestUserModel: GuestUserModel,
   ): GuestUserModel[] {
     try {
@@ -119,7 +184,18 @@ export class GuestUserService {
     }
   }
 
-  private removeGuestUserModelFromGuestUsers$(emailAddress: string) {
+  /**
+   * Removes a GuestUserModel from the current value of the guestUser$ value.
+   * Returns the modified array after removing the model.
+   *
+   * @private
+   * @param {string} emailAddress
+   * @returns {GuestUserModel []}
+   * @memberof GuestUserService
+   */
+  private removeGuestUserModelFromGuestUsers$Value(
+    emailAddress: string,
+  ): GuestUserModel[] {
     try {
       const guestUserModels = this.guestUsers$.getValue();
       const i = guestUserModels.findIndex(
@@ -132,12 +208,30 @@ export class GuestUserService {
     }
   }
 
-  private async getAllGuestUsers(): Promise<GuestUserModel[]> {
-    return await this.guestUserModel.find({}, (err, docs) => {
-      return docs as GuestUserModel[];
-    });
+  /**
+   * Retrieves all guest user models from the mongodb.
+   *
+   * @private
+   * @returns {Promise<GuestUserModel[]>} a promise containing an array of GuestUsermodels
+   * @memberof GuestUserService
+   */
+  private async getAllGuestUserModelsFromdb(): Promise<GuestUserModel[]> {
+    try {
+      return await this.guestUserModel.find({}, (err, docs) => {
+        return docs as GuestUserModel[];
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
+  /**
+   * Saves a GuestUserModel to the mongodb.
+   * @private
+   * @param {GuestUserModel} guestUserModel
+   * @returns {Promise<void>}
+   * @memberof GuestUserService
+   */
   private async saveGuestUserModelToMongodb(
     guestUserModel: GuestUserModel,
   ): Promise<void> {
@@ -148,14 +242,33 @@ export class GuestUserService {
     }
   }
 
+  /**
+   *
+   * Deletes an entry from the mongodb. Uses the unique email address identifier.
+   * @private
+   * @param {string} emailAddress
+   * @returns {Promise<void>} empty promise when the operation succeeds
+   * @memberof GuestUserService
+   */
   private async deleteGuestUserModelFromMongodb(
     emailAddress: string,
   ): Promise<void> {
     try {
       await this.guestUserModel.deleteOne({ emailAddress });
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   }
 
+  /**
+   *
+   * Creates a GuestUserModel that can be saved to the mongodb.
+   * Adds expiration date equal to the toDate. (Auto expires and deletes the record when this time is passed - 60 seconds interval)
+   * @private
+   * @param {GuestUser} guestUser generated object used by the ISE API
+   * @returns {GuestUserModel} valid guest model used in the mongodb
+   * @memberof GuestUserService
+   */
   private createGuestUserModel(guestUser: GuestUser): GuestUserModel {
     try {
       const { personBeingVisited } = guestUser;
@@ -175,6 +288,13 @@ export class GuestUserService {
     } catch (error) {}
   }
 
+  /**
+   *
+   * Generates a valid GuestAccessInfo object as needed for the ISE API.
+   * @private
+   * @returns {GuestAccessInfo}
+   * @memberof GuestUserService
+   */
   private generateGuestAccessInfo(): GuestAccessInfo {
     const toDate = moment()
       .add(this.VALID_DAYS, DAY)
@@ -184,10 +304,21 @@ export class GuestUserService {
       toDate,
       fromDate,
       location: LOCATION,
-      validDays: this.VALID_DAYS + 1, // why + 1 day needed for ISE api??
+      validDays: this.VALID_DAYS + 1, //TODO: why + 1 day needed for ISE api??
     } as GuestAccessInfo;
   }
 
+  /**
+   *
+   * generates a GuestInfo object as needed by the ISE API.
+   * @private
+   * @param {string} firstName
+   * @param {string} surName
+   * @param {string} password
+   * @param {string} emailAddress
+   * @returns {GuestInfo}
+   * @memberof GuestUserService
+   */
   private generateGuestInfo(
     firstName: string,
     surName: string,
@@ -206,6 +337,15 @@ export class GuestUserService {
     return guestInfo;
   }
 
+  /**
+   * generates a GuestUser object as needed by the ISE API.
+   * @private
+   * @param {GuestInfo} guestInfo a valid GuestInfo object
+   * @param {string} personBeingVisited email address from the person being visited
+   * @param {string} reasonForVisit any string containing the reason for visit
+   * @returns {GuestUser}
+   * @memberof GuestUserService
+   */
   private generateGuestUser(
     guestInfo: GuestInfo,
     personBeingVisited: string,
