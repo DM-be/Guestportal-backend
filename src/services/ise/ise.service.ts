@@ -9,6 +9,12 @@ import * as https from 'https';
 const PORTAL_ID = 'f10871e0-7159-11e7-a355-005056aba474';
 const GUESTUSER = 'identity.guestuser.2.0';
 
+/**
+ * service responsible for communicating directly with the ISE API
+ *
+ * @export
+ * @class IseService
+ */
 @Injectable()
 export class IseService {
   private BASE_URL = 'https://172.21.106.51:9060/ers/config';
@@ -18,6 +24,13 @@ export class IseService {
   };
   //TODO: get values from vault in constructor/ docker-compose env
 
+  /**
+   *sends an email with the valid credentials
+   *
+   * @param {String} guestUserId guestUserId (in the form of unique email address)
+   * @returns {Promise<AxiosResponse>} Axios response containing HTTP verb
+   * @memberof IseService
+   */
   public async sendEmailWithCredentials(
     guestUserId: String,
   ): Promise<AxiosResponse> {
@@ -29,6 +42,14 @@ export class IseService {
     }
   }
 
+  /**
+   * public function that creates a guest user on the ISE server
+   *
+   *
+   * @param {IseGuestUserDto} iseGuestUserDto data transfer object used with parameters required for the ISE API
+   * @returns {Promise<AxiosResponse>} response containing status, headers,...
+   * @memberof IseService
+   */
   public async createISEGuestUser(
     iseGuestUserDto: IseGuestUserDto,
   ): Promise<AxiosResponse> {
@@ -45,6 +66,14 @@ export class IseService {
     }
   }
 
+  /**
+   *
+   * public function that deletes a guest user from the ISE server
+   *
+   * @param {string} guestUserEmailAsId string containing the email address of the guest user, used to uniquely identify the user
+   * @returns {Promise<AxiosResponse>} response containing status, headers,...
+   * @memberof IseService
+   */
   public async deleteISEGuestUser(
     guestUserEmailAsId: string,
   ): Promise<AxiosResponse> {
@@ -56,7 +85,6 @@ export class IseService {
     }
   }
 
-  // todo: implement API call
   public async getActiveDirectoryUsers(): Promise<ActiveDirectoryUser[]> {
     return new Promise(resolve => {
       resolve([
@@ -85,6 +113,16 @@ export class IseService {
     });
   }
 
+  /**
+   *
+   * helper function that creates an AxiosRequestConfig object
+   * used by all Axios calls in this service
+   * uses constants to set the mediaType of the header
+   * @private
+   * @param {string} mediatype required mediaType
+   * @returns {AxiosRequestConfig} a valid AxiosRequestConfig used by Axios requests
+   * @memberof IseService
+   */
   private generateAxiosRequestConfig(mediatype: string): AxiosRequestConfig {
     const headers = new AxiosIseRequestHeader();
     headers.setMediaType(mediatype);
@@ -97,14 +135,22 @@ export class IseService {
     } as AxiosRequestConfig;
   }
 
-  private handleError(error: any, errorMessage: string) {
-    const axiosError = error as AxiosError;
+  /**
+   *
+   * helper function to handle requests returned by API calls
+   *
+   * @private
+   * @param {AxiosError} axiosError axios error object
+   * @param {string} errorMessage the errormessage
+   * @memberof IseService
+   */
+  private handleError(axiosError: AxiosError, errorMessage: string) {
     if (axiosError.response.status === 400) {
       console.log(
         `${errorMessage}; errorStatusText: ${axiosError.response.statusText}`,
       );
     } else {
-      console.log(`unknown error occured ${error}`);
+      console.log(`unknown error occured ${axiosError}`);
     }
   }
 }
