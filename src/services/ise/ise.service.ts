@@ -28,7 +28,7 @@ export class IseService {
    *sends an email with the valid credentials
    *
    * @param {String} guestUserId guestUserId (in the form of unique email address)
-   * @returns {Promise<AxiosResponse>} Axios response containing HTTP verb
+   * @returns {Promise<AxiosResponse>} Axios response containing status/data/...
    * @memberof IseService
    */
   public async sendEmailWithCredentials(
@@ -47,7 +47,7 @@ export class IseService {
    *
    *
    * @param {IseGuestUserDto} iseGuestUserDto data transfer object used with parameters required for the ISE API
-   * @returns {Promise<AxiosResponse>} response containing status, headers,...
+   * @returns {Promise<AxiosResponse>} Axios response containing status/data/...
    * @memberof IseService
    */
   public async createISEGuestUser(
@@ -71,7 +71,7 @@ export class IseService {
    * public function that deletes a guest user from the ISE server
    *
    * @param {string} guestUserEmailAsId string containing the email address of the guest user, used to uniquely identify the user
-   * @returns {Promise<AxiosResponse>} response containing status, headers,...
+   * @returns {Promise<AxiosResponse>} Axios response containing status/data/...
    * @memberof IseService
    */
   public async deleteISEGuestUser(

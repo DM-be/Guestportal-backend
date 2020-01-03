@@ -110,14 +110,17 @@ export class GuestUserService {
   }
 
   /**
-   * Public exposed function used by the guest user controller.
+   *  Public exposed function used by the guest user controller.
    * Removes a guest user from the guest user mongodb and the ISE api.
    * Emits the value of the modified subject after removing the user sucessfully
    *
    * @param {RemoveGuestUserDto} removeGuestUserDto
+   * @returns {Promise<void>}
    * @memberof GuestUserService
    */
-  public async removeGuestUser(removeGuestUserDto: RemoveGuestUserDto) {
+  public async removeGuestUser(
+    removeGuestUserDto: RemoveGuestUserDto,
+  ): Promise<void> {
     try {
       //await this.iseService.deleteISEGuestUser(removeGuestUserDto.emailAddress);
       await this.deleteGuestUserModelFromMongodb(
@@ -128,7 +131,9 @@ export class GuestUserService {
           removeGuestUserDto.emailAddress,
         ),
       );
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   /**

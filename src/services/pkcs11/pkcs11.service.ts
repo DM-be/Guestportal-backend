@@ -26,7 +26,6 @@ const LIB = '/usr/lib/x86_64-linux-gnu/libbeidpkcs11.so.0'; // todo: get from en
  * @class Pkcs11Service
  */
 @Injectable()
-
 export class Pkcs11Service {
   /**
    * variable holding a reference to the PKCS11 library
@@ -35,8 +34,7 @@ export class Pkcs11Service {
    * @type {PKCS11}
    * @memberof Pkcs11Service
    */
-  private pkcs11: PKCS11; 
-
+  private pkcs11: PKCS11;
 
   /**
    * reference to the card reader using smartcard library
@@ -66,7 +64,7 @@ export class Pkcs11Service {
    *
    *
    * @private
-   * 
+   *
    * @returns {Promise<void>} empty promise when reading and emitting the EID data is successful
    * @memberof Pkcs11Service
    */
@@ -96,8 +94,6 @@ export class Pkcs11Service {
   }
 
   /**
-   *  const eidUser: EidUserDto = this.readEidUser();
-        await this.eidGateway.emitEidUser(eidUser);
    * opens a session with the pkcs11 library and reads a buffer from the inserted card
    * @private
    * @returns {Buffer} buffer returned by the opening of a session
@@ -111,7 +107,7 @@ export class Pkcs11Service {
   }
 
   /**
-   *  reads the objects found in the buffer of a session and converts it to a DTO
+   * reads the objects found in the buffer of a session and converts it to a DTO
    * closes the session afterwards
    *
    * @private
