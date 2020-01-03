@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ActiveDirectoryUser } from 'src/models/ActiveDirectoryUser';
-import { IseService } from '../ise/ise.service';
+import * as ActiveDirectory from 'activedirectory';
+import { ActiveDirectoryConfig } from 'src/models/ActiveDirectoryConfig';
+const GROUP_NAME = 'werknemers'; // CN or DN
 
 /**
- * microservice responsible for (indirect) communication with the Active Directory
+ * microservice responsible for communication with the Active Directory using LDAP
  *
  * @export
  * @class ActiveDirectoryService
@@ -11,25 +13,57 @@ import { IseService } from '../ise/ise.service';
 @Injectable()
 export class ActiveDirectoryService {
   /**
-   *Creates an instance of ActiveDirectoryService.
-   * @param {IseService} iseService an instance of the IseService class (direct communication with ISE server)
+   * reference to the ActiveDirectory connection
+   *
+   * @private
+   * @type {ActiveDirectory}
    * @memberof ActiveDirectoryService
    */
-  constructor(private iseService: IseService) {}
+  private ad: ActiveDirectory;
 
   /**
-   * delegates a call to the IseService getActiveDirectoryUsers() to return AD users
-   *
-   * @returns {Promise< ActiveDirectoryUser[]>} 
-   * Promise containing all Active Directory Users
-   *  
+   *Creates an instance of ActiveDirectoryService.
    * @memberof ActiveDirectoryService
    */
-  public async getListOfVisiteesFromActiveDirectory(): Promise<
-    ActiveDirectoryUser[]
-  > {
+  constructor() {
+    this.initializeActiveDirectory();
+  }
+
+  /**
+   * initializes the ActiveDirectory reference using the activedirectory package and configurtion
+   *
+   * @private
+   * @memberof ActiveDirectoryService
+   */
+  private initializeActiveDirectory(): void {
+    const config: ActiveDirectoryConfig = {
+      baseDN: '',
+      password: '',
+      url: '',
+      username: '',
+    };
+    this.ad = new ActiveDirectory(config);
+  }
+
+  /**
+   * retrieves a list of active directory users, using the constant group name and reference to the AD
+   * casts the userObjects returned to the ActivedirectoryUser interface
+   *
+   * @returns {Promise<ActiveDirectoryUser[]>}
+   * @memberof ActiveDirectoryService
+   */
+  public getUsersFromActiveDirectory(): Promise<ActiveDirectoryUser[]> {
     try {
-      return await this.iseService.getActiveDirectoryUsers();
-    } catch (error) {}
+      return new Promise((resolve, reject) => {
+        this.ad.getUsersForGroup(GROUP_NAME, (err, userObjects: Object[]) => {
+          if (err) {
+            reject(err);
+          }
+          resolve(userObjects as ActiveDirectoryUser[]);
+        });
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
