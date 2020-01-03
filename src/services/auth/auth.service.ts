@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/services/users/users.service';
 import { JwtPayload } from 'src/models/JwtPayload';
@@ -34,19 +38,23 @@ export class AuthService {
   public async validateUserByPassword(
     loginAttempt: LoginUserDto,
   ): Promise<TokenResponse> {
-    const userToAttempt: Model<UserMongoose> = await this.usersService.findOneByEmail(
-      loginAttempt.email,
-    );
-    return new Promise(resolve => {
-      userToAttempt.checkPassword(loginAttempt.password, (err, isMatch) => {
-        if (err) throw new UnauthorizedException();
-        if (isMatch) {
-          resolve(this.createJwtPayload(userToAttempt));
-        } else {
-          throw new UnauthorizedException();
-        }
+    try {
+      const userToAttempt: Model<UserMongoose> = await this.usersService.findOneByEmail(
+        loginAttempt.email,
+      );
+      return new Promise((resolve, reject) => {
+        userToAttempt.checkPassword(loginAttempt.password, (err, isMatch) => {
+          if (err) {
+            reject(new UnauthorizedException());
+          }
+          if (isMatch) {
+            resolve(this.createJwtPayload(userToAttempt));
+          }
+        });
       });
-    });
+    } catch (error) {
+      return Promise.reject(new InternalServerErrorException(error));
+    }
   }
 
   /**
@@ -57,13 +65,19 @@ export class AuthService {
    * @memberof AuthService
    */
   async validateUserByJwt(payload: JwtPayload): Promise<TokenResponse> {
-    const user: Model<UserMongoose> = await this.usersService.findOneByEmail(
-      payload.email,
-    );
-    if (user) {
-      return this.createJwtPayload(user);
-    } else {
-      throw new UnauthorizedException();
+    try {
+      const user: Model<UserMongoose> = await this.usersService.findOneByEmail(
+        payload.email,
+      );
+      return new Promise((resolve, reject) => {
+        if (user) {
+          resolve(this.createJwtPayload(user));
+        } else {
+          reject(new UnauthorizedException());
+        }
+      });
+    } catch (error) {
+      return Promise.reject(new InternalServerErrorException(error));
     }
   }
 
