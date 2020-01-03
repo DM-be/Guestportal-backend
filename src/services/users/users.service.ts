@@ -5,7 +5,7 @@ import { Model } from 'mongoose';
 import { CreateUserDto } from 'src/models/CreateUserDto.dto';
 
 /**
- * class used to create new administrator users
+ * class used to create new administrator users,
  * saves the create admin user to the mongodb
  *
  * @export
