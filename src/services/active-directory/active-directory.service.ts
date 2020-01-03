@@ -3,6 +3,10 @@ import { ActiveDirectoryUser } from 'src/models/ActiveDirectoryUser';
 import * as ActiveDirectory from 'activedirectory';
 import { ActiveDirectoryConfig } from 'src/models/ActiveDirectoryConfig';
 const GROUP_NAME = 'werknemers'; // CN or DN
+const BASE_DN = '';
+const AD_USERNAME = '';
+const AD_PASSWORD = '';
+const AD_URL = '';
 
 /**
  * microservice responsible for communication with the Active Directory using LDAP
@@ -37,10 +41,10 @@ export class ActiveDirectoryService {
    */
   private initializeActiveDirectory(): void {
     const config: ActiveDirectoryConfig = {
-      baseDN: '',
-      password: '',
-      url: '',
-      username: '',
+      baseDN: BASE_DN,
+      password: AD_PASSWORD,
+      url: AD_URL,
+      username: AD_USERNAME,
     };
     this.ad = new ActiveDirectory(config);
   }
