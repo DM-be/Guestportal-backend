@@ -3,10 +3,11 @@ import {
   WebSocketServer,
   SubscribeMessage,
   OnGatewayConnection,
+  WsException,
 } from '@nestjs/websockets';
 import { GuestUserService } from 'src/services/guest-user/guest-user.service';
 import { RemoveGuestUserDto } from 'src/models/RemoveGuestUserDto';
-import { UseGuards, UnauthorizedException } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Socket } from 'socket.io';
 import { AuthService } from 'src/services/auth/auth.service';
@@ -15,7 +16,19 @@ import { JwtPayload } from 'src/models/JwtPayload';
 import { TokenResponse } from 'src/models/TokenResponse';
 
 const ALLOWED_ORIGINS = 'localhost:4200';
+const REMOVE_USER = 'removeUser';
+const REFRESH_TOKEN = 'refreshToken';
+const SECRET_KEY = 'secretKey'; //TODO: get from vault or helper service for secret keys
+const GUEST_USER_DB_CHANGE = 'guestUserDatabaseChange';
 
+/**
+ * the GuestUserGateway provided for guest user actions
+ * secured through the assigned JWT token for admin users
+ *
+ * @export
+ * @class GuestUserGateWay
+ * @implements {OnGatewayConnection}
+ */
 @WebSocketGateway(3002, { origin: ALLOWED_ORIGINS })
 export class GuestUserGateWay implements OnGatewayConnection {
   @WebSocketServer() server;
@@ -27,44 +40,78 @@ export class GuestUserGateWay implements OnGatewayConnection {
     this.subscribeToGuestUserDatabaseChanges();
   }
 
-  async handleConnection(client: Socket) {
-    console.log(client.handshake.query.token);
-    // const token = client.handshake.query.token;
-    // const jwtPayload: JwtPayload = <JwtPayload>jwt.verify(token, 'secretkey'); //TODO: get secretkey from env
-    // try {
-    //   const refreshedToken: TokenResponse = await this.authService.validateUserByJwt(
-    //     jwtPayload,
-    //   );
-    //   await this.refreshClientToken(refreshedToken);
-    // } catch (error) {
-    //   console.log('token not valid');
-    //   client.disconnect();
-    // }
-  }
-
-  // @UseGuards(AuthGuard())
-  @SubscribeMessage('removeUser')
-  private async removeGuestUser(removeGuestUserDto: RemoveGuestUserDto) {
+  /**
+   * handles the client socket from the frontend
+   * when the client connects, the token is verified wit the secret key
+   * on verification the websocket emits the refreshed token through the secure connection
+   *
+   * @param {Socket} client the frontend client
+   * @returns {Promise<void>}
+   * @memberof GuestUserGateWay
+   */
+  public async handleConnection(client: Socket): Promise<void> {
+    const token = client.handshake.query.token;
+    const jwtPayload: JwtPayload = <JwtPayload>jwt.verify(token, SECRET_KEY);
     try {
-      console.log('removing....');
-     await this.guestUserService.removeGuestUser(removeGuestUserDto);
-    } catch (error) {}
+      const refreshedToken: TokenResponse = await this.authService.validateUserByJwt(
+        jwtPayload,
+      );
+      await this.refreshClientToken(refreshedToken);
+    } catch (error) {
+      return error;
+    } finally {
+      client.disconnect();
+    }
   }
 
+  /**
+   * removes a guest user using the guestuser service and the removeguestuserdto
+   * is protected by the guard decorator, only messages with the token included in the emit are allowed
+   * @param {RemoveGuestUserDto} removeGuestUserDto the emailaddress of the guest user
+   * @returns
+   * @memberof GuestUserGateWay
+   */
+  @UseGuards(AuthGuard())
+  @SubscribeMessage(REMOVE_USER)
+  public async removeGuestUser(removeGuestUserDto: RemoveGuestUserDto) {
+    try {
+      await this.guestUserService.removeGuestUser(removeGuestUserDto);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+   * subscription to the guest user subject in the guest user service
+   * whenever a user is added or removed, the socket will emit the full new guest user model array
+   * the frontend also subscribes to this event using the same logic
+   *
+   *
+   * @private
+   * @memberof GuestUserGateWay
+   */
   private async subscribeToGuestUserDatabaseChanges() {
     this.guestUserService.guestUsers$.subscribe(async guestUserModelArray => {
       if (guestUserModelArray) {
-        await this.server.emit('guestUserDatabaseChange', guestUserModelArray);
+        await this.server.emit(GUEST_USER_DB_CHANGE, guestUserModelArray);
       }
     });
   }
 
+  /**
+   * emits a refreshed token for the connected client
+   *
+   * @private
+   * @param {TokenResponse} tokenResponse
+   * @returns {Promise<void>}
+   * @memberof GuestUserGateWay
+   */
   @UseGuards(AuthGuard())
-  private async refreshClientToken(tokenResponse: TokenResponse) {
+  public async refreshClientToken(tokenResponse: TokenResponse): Promise<void> {
     try {
-      await this.server.emit('refreshToken', tokenResponse);
+      await this.server.emit(REFRESH_TOKEN, tokenResponse);
     } catch (error) {
-      console.log(error);
+      return Promise.reject(new WsException(error));
     }
   }
 }
