@@ -53,17 +53,13 @@ export class ActiveDirectoryService {
    * @memberof ActiveDirectoryService
    */
   public getUsersFromActiveDirectory(): Promise<ActiveDirectoryUser[]> {
-    try {
-      return new Promise((resolve, reject) => {
-        this.ad.getUsersForGroup(GROUP_NAME, (err, userObjects: Object[]) => {
-          if (err) {
-            reject(err);
-          }
-          resolve(userObjects as ActiveDirectoryUser[]);
-        });
+    return new Promise((resolve, reject) => {
+      this.ad.getUsersForGroup(GROUP_NAME, (err, userObjects: Object[]) => {
+        if (err) {
+          reject(new InternalServerErrorException(err));
+        }
+        resolve(userObjects as ActiveDirectoryUser[]);
       });
-    } catch (error) {
-      console.log(error);
-    }
+    });
   }
 }

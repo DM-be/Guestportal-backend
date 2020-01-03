@@ -30,7 +30,7 @@ export class AdController {
     description: 'Retrieved active directory users succesfully',
   })
   @Get()
-  async getActiveDirectoryUsers(): Promise<ActiveDirectoryUser[]> {
+  public async getActiveDirectoryUsers(): Promise<ActiveDirectoryUser[]> {
     try {
       return await this.adService.getUsersFromActiveDirectory();
     } catch (error) {
