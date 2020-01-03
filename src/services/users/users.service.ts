@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel, MongooseModule } from '@nestjs/mongoose';
 import { UserMongoose } from 'src/models/UserMongoose';
 import { Model } from 'mongoose';
@@ -6,7 +6,7 @@ import { CreateUserDto } from 'src/models/CreateUserDto.dto';
 
 /**
  * class used to create new administrator users
- * saves the
+ * saves the create admin user to the mongodb
  *
  * @export
  * @class UsersService
@@ -32,7 +32,7 @@ export class UsersService {
       const createdUser = new this.userModel(createUserDto);
       return await createdUser.save();
     } catch (error) {
-      console.log(error);
+      return Promise.reject(new InternalServerErrorException(error));
     }
   }
 
@@ -47,7 +47,7 @@ export class UsersService {
     try {
       return await this.userModel.findOne({ email });
     } catch (error) {
-      console.log(error);
+      return Promise.reject(new InternalServerErrorException(error));
     }
   }
 }
