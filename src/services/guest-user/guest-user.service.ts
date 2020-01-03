@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { IseService } from '../ise/ise.service';
 import * as moment from 'moment';
 import { CreateGuestUserDto } from 'src/models/CreateGuestUserDto.dto';
@@ -104,8 +104,7 @@ export class GuestUserService {
         this.addGuestUserModelToGuestUsers$Value(guestUserModel),
       );
     } catch (error) {
-      console.log(error);
-      console.log(`could not create Ise guest user ${error}`);
+      return Promise.reject(new InternalServerErrorException(error));
     }
   }
 
@@ -132,7 +131,7 @@ export class GuestUserService {
         ),
       );
     } catch (error) {
-      console.log(error);
+      return Promise.reject(new InternalServerErrorException(error));
     }
   }
 
@@ -148,7 +147,7 @@ export class GuestUserService {
       this.guestUsers$ = new BehaviorSubject(undefined);
       this.guestUsers$.next(await this.getAllGuestUserModelsFromdb());
     } catch (error) {
-      console.log(error);
+      throw new Error(error);
     }
   }
 
@@ -181,11 +180,10 @@ export class GuestUserService {
   ): GuestUserModel[] {
     try {
       const guestUserModels = this.guestUsers$.getValue();
-      console.log('add');
       guestUserModels.push(guestUserModel);
       return guestUserModels;
     } catch (error) {
-      console.log(error);
+      throw new Error(error);
     }
   }
 
@@ -209,7 +207,7 @@ export class GuestUserService {
       guestUserModels.splice(i, 1);
       return guestUserModels;
     } catch (error) {
-      console.log(error);
+      throw new Error(error);
     }
   }
 
@@ -226,7 +224,7 @@ export class GuestUserService {
         return docs as GuestUserModel[];
       });
     } catch (error) {
-      console.log(error);
+      return Promise.reject(new InternalServerErrorException(error));
     }
   }
 
@@ -243,7 +241,7 @@ export class GuestUserService {
     try {
       await new this.guestUserModel(guestUserModel).save();
     } catch (error) {
-      console.log(error);
+      return Promise.reject(new InternalServerErrorException(error));
     }
   }
 
@@ -261,7 +259,7 @@ export class GuestUserService {
     try {
       await this.guestUserModel.deleteOne({ emailAddress });
     } catch (error) {
-      console.log(error);
+      return Promise.reject(new InternalServerErrorException(error));
     }
   }
 
@@ -290,7 +288,9 @@ export class GuestUserService {
           .add(1, 'm')
           .toDate(),
       } as GuestUserModel;
-    } catch (error) {}
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 
   /**
