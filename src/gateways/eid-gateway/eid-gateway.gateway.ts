@@ -15,7 +15,7 @@ const READ_CARD_EVENT = 'readCardDataEvent';
  * @export
  * @class EidGateway
  */
-@WebSocketGateway(3001, { origin: ALLOWED_ORIGINS })
+@WebSocketGateway(5001, { origin: ALLOWED_ORIGINS })
 export class EidGateway {
   @WebSocketServer() server;
 

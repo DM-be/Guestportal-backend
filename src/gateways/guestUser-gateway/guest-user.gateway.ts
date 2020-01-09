@@ -29,7 +29,7 @@ const GUEST_USER_DB_CHANGE = 'guestUserDatabaseChange';
  * @class GuestUserGateWay
  * @implements {OnGatewayConnection}
  */
-@WebSocketGateway(3002, { origin: ALLOWED_ORIGINS })
+@WebSocketGateway(5002, { origin: ALLOWED_ORIGINS })
 export class GuestUserGateWay implements OnGatewayConnection {
   @WebSocketServer() server;
 
