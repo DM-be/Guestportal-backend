@@ -11,10 +11,11 @@ import { GuestUserModel } from 'src/models/GuestUserModel';
 import { Model } from 'mongoose';
 import { BehaviorSubject } from 'rxjs';
 import { RemoveGuestUserDto } from 'src/models/RemoveGuestUserDto';
+import { environment } from 'src/environments/environment';
 
 //TODO: move to env
 const LOCATION = 'Brussels';
-const PORTAL_ID = 'f10871e0-7159-11e7-a355-005056aba474';
+const PORTAL_ID =  environment.portal //'f10871e0-7159-11e7-a355-005056aba474';
 const GUEST_TYPE = 'Weekly (default)'; // TODO: check guest type
 const MOMENT_FORMAT = 'MM/DD/YYYY HH:mm';
 const DAY = 'day';
