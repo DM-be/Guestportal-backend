@@ -50,9 +50,12 @@ export class GuestUserGateWay implements OnGatewayConnection {
    * @memberof GuestUserGateWay
    */
   public async handleConnection(client: Socket): Promise<void> {
-    const token = client.handshake.query.token;
-    const jwtPayload: JwtPayload = <JwtPayload>jwt.verify(token, SECRET_KEY);
+  
     try {
+     
+      const token = client.handshake.query.token;
+      console.log(token);
+      const jwtPayload: JwtPayload = await <JwtPayload>jwt.verify(token, SECRET_KEY);
       const refreshedToken: TokenResponse = await this.authService.validateUserByJwt(
         jwtPayload,
       );
@@ -77,7 +80,7 @@ export class GuestUserGateWay implements OnGatewayConnection {
     try {
       await this.guestUserService.removeGuestUser(removeGuestUserDto);
     } catch (error) {
-      return Promise.reject(error);
+      return await Promise.reject(error);
     }
   }
 
@@ -111,7 +114,7 @@ export class GuestUserGateWay implements OnGatewayConnection {
     try {
       await this.server.emit(REFRESH_TOKEN, tokenResponse);
     } catch (error) {
-      return Promise.reject(new WsException(error));
+      return await Promise.reject(new WsException(error));
     }
   }
 }
