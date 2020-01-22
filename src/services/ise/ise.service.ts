@@ -7,7 +7,7 @@ import { ActiveDirectoryUser } from 'src/models/ActiveDirectoryUser';
 import * as https from 'https';
 import { environment } from 'src/environments/environment';
 
-const PORTAL_ID = environment.portal //'f10871e0-7159-11e7-a355-005056aba474';
+const PORTAL_ID = environment.portal; //'f10871e0-7159-11e7-a355-005056aba474';
 const GUESTUSER = 'identity.guestuser.2.0';
 
 /**
@@ -18,7 +18,7 @@ const GUESTUSER = 'identity.guestuser.2.0';
  */
 @Injectable()
 export class IseService {
-  private BASE_URL =  environment.ise_api_url//'https://172.21.106.51:9060/ers/config';
+  private BASE_URL = environment.ise_api_url; //'https://172.21.106.51:9060/ers/config';
   private AXIOSISEAUTH: AxiosIseAuth = {
     username: 'portaluser',
     password: 'Vergeten123!',
@@ -84,34 +84,6 @@ export class IseService {
     } catch (error) {
       this.handleError(error, 'could not create delete guestuser');
     }
-  }
-
-  public async getActiveDirectoryUsers(): Promise<ActiveDirectoryUser[]> {
-    return new Promise(resolve => {
-      resolve([
-        {
-          name: 'john smith',
-        },
-        {
-          name: 'test name',
-        },
-        {
-          name: 'test name',
-        },
-        {
-          name: 'test name',
-        },
-        {
-          name: 'test name',
-        },
-        {
-          name: 'test name',
-        },
-        {
-          name: 'test name',
-        },
-      ] as ActiveDirectoryUser[]);
-    });
   }
 
   /**

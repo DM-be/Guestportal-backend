@@ -66,4 +66,41 @@ export class ActiveDirectoryService {
       });
     });
   }
+
+  public async getUsersFromActiveDirectoryMock(): Promise<
+    ActiveDirectoryUser[]
+  > {
+    return new Promise(resolve => {
+      resolve([
+        {
+          name: 'john smith',
+          email: 'johnsmit@test.com',
+        },
+        {
+          name: 'random name',
+          email: 'johnsmit@test.com',
+        },
+        {
+          name: 'test name',
+          email: 'johnsmit@test.com',
+        },
+        {
+          name: 'test name',
+          email: 'johnsmit@test.com',
+        },
+        {
+          name: 'test name',
+          email: 'johnsmit@test.com',
+        },
+        {
+          name: 'test name',
+          email: 'johnsmit@test.com',
+        },
+        {
+          name: 'test name',
+          email: 'johnsmit@test.com',
+        },
+      ] as ActiveDirectoryUser[]);
+    });
+  }
 }
