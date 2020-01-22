@@ -3,6 +3,8 @@ import { LoginUserDto } from 'src/models/LoginUserDto.dto';
 import { AuthService } from '../../services/auth/auth.service';
 import { ApiTags, ApiOkResponse } from '@nestjs/swagger';
 import { TokenResponse } from 'src/models/TokenResponse';
+import { AdminUserIncorrectPasswordError } from 'src/models/AdminUserIncorrectPasswordError';
+import { AdminUserDoesNotExistError } from 'src/models/AdminUserDoesNotExistError';
 
 /**
  * controller responsible for authentication of admin users
@@ -29,10 +31,13 @@ export class AuthController {
   @Post()
   public async login(
     @Body() loginUserDto: LoginUserDto,
-  ): Promise<TokenResponse> {
+  ): Promise<
+    TokenResponse | AdminUserIncorrectPasswordError | AdminUserDoesNotExistError
+  > {
     try {
       return await this.authService.validateUserByPassword(loginUserDto);
     } catch (error) {
+      console.log(error.message)
       return error;
     }
   }

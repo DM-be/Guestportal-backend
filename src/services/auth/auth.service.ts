@@ -10,6 +10,8 @@ import { TokenResponse } from 'src/models/TokenResponse';
 import { LoginUserDto } from 'src/models/LoginUserDto.dto';
 import { UserMongoose } from 'src/models/UserMongoose';
 import { Model } from 'mongoose';
+import { AdminUserDoesNotExistError } from 'src/models/AdminUserDoesNotExistError';
+import { AdminUserIncorrectPasswordError } from 'src/models/AdminUserIncorrectPasswordError';
 
 /**
  * authentication service used to for user (admin) validation
@@ -37,21 +39,27 @@ export class AuthService {
    */
   public async validateUserByPassword(
     loginAttempt: LoginUserDto,
-  ): Promise<TokenResponse> {
+  ): Promise<TokenResponse | AdminUserIncorrectPasswordError> {
     try {
       const userToAttempt: Model<UserMongoose> = await this.usersService.findOneByEmail(
         loginAttempt.email,
       );
-      return new Promise((resolve, reject) => {
-        userToAttempt.checkPassword(loginAttempt.password, (err, isMatch) => {
-          if (err) {
-            reject(new UnauthorizedException());
-          }
-          if (isMatch) {
-            resolve(this.createJwtPayload(userToAttempt));
-          }
+      if (userToAttempt) {
+        return new Promise((resolve, reject) => {
+          userToAttempt.checkPassword(loginAttempt.password, (err, isMatch) => {
+            if (err) {
+              return reject(new InternalServerErrorException(err));
+            }
+            if (isMatch) {
+              return resolve(this.createJwtPayload(userToAttempt));
+            }
+            if (!isMatch) {
+              return resolve(new AdminUserIncorrectPasswordError());
+            }
+          });
         });
-      });
+      }
+      return Promise.reject(new AdminUserDoesNotExistError());
     } catch (error) {
       return Promise.reject(new InternalServerErrorException(error));
     }
