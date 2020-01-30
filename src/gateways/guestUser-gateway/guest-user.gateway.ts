@@ -63,7 +63,7 @@ export class GuestUserGateWay implements OnGatewayConnection {
     } catch (error) {
       return error;
     } finally {
-      client.disconnect();
+     // client.disconnect();
     }
   }
 
@@ -74,7 +74,7 @@ export class GuestUserGateWay implements OnGatewayConnection {
    * @returns
    * @memberof GuestUserGateWay
    */
-  @UseGuards(AuthGuard())
+
   @SubscribeMessage(REMOVE_USER)
   public async removeGuestUser(removeGuestUserDto: RemoveGuestUserDto) {
     try {
