@@ -260,6 +260,7 @@ export class GuestUserService {
     try {
       await this.guestUserModel.deleteOne({ emailAddress });
     } catch (error) {
+      
       return Promise.reject(new InternalServerErrorException(error));
     }
   }

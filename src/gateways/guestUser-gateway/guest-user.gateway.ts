@@ -7,18 +7,17 @@ import {
 } from '@nestjs/websockets';
 import { GuestUserService } from 'src/services/guest-user/guest-user.service';
 import { RemoveGuestUserDto } from 'src/models/RemoveGuestUserDto';
-import { UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { Socket } from 'socket.io';
 import { AuthService } from 'src/services/auth/auth.service';
 import * as jwt from 'jsonwebtoken';
 import { JwtPayload } from 'src/models/JwtPayload';
 import { TokenResponse } from 'src/models/TokenResponse';
+import { environment } from 'src/environments/environment';
 
-const ALLOWED_ORIGINS = 'localhost:4200';
+
 const REMOVE_USER = 'removeUser';
 const REFRESH_TOKEN = 'refreshToken';
-const SECRET_KEY = 'secretKey'; //TODO: get from vault or helper service for secret keys
+const SECRET_KEY = 'secretkey'; //TODO: get from vault or helper service for secret keys
 const GUEST_USER_DB_CHANGE = 'guestUserDatabaseChange';
 
 /**
@@ -29,7 +28,7 @@ const GUEST_USER_DB_CHANGE = 'guestUserDatabaseChange';
  * @class GuestUserGateWay
  * @implements {OnGatewayConnection}
  */
-@WebSocketGateway(5002, { origin: ALLOWED_ORIGINS })
+@WebSocketGateway(5002, { origin: environment.allowed_origins })
 export class GuestUserGateWay implements OnGatewayConnection {
   @WebSocketServer() server;
 
@@ -50,20 +49,21 @@ export class GuestUserGateWay implements OnGatewayConnection {
    * @memberof GuestUserGateWay
    */
   public async handleConnection(client: Socket): Promise<void> {
-  
     try {
-     
       const token = client.handshake.query.token;
-      console.log(token);
-      const jwtPayload: JwtPayload = await <JwtPayload>jwt.verify(token, SECRET_KEY);
+      const jwtPayload: JwtPayload = await (<JwtPayload>(
+        jwt.verify(token, SECRET_KEY)
+      ));
       const refreshedToken: TokenResponse = await this.authService.validateUserByJwt(
         jwtPayload,
       );
       await this.refreshClientToken(refreshedToken);
     } catch (error) {
+      // disconnect when invalid
+      client.disconnect();
       return error;
     } finally {
-     // client.disconnect();
+      // client.disconnect();
     }
   }
 
@@ -80,6 +80,7 @@ export class GuestUserGateWay implements OnGatewayConnection {
     try {
       await this.guestUserService.removeGuestUser(removeGuestUserDto);
     } catch (error) {
+      console.log(error);
       return await Promise.reject(error);
     }
   }
@@ -109,7 +110,7 @@ export class GuestUserGateWay implements OnGatewayConnection {
    * @returns {Promise<void>}
    * @memberof GuestUserGateWay
    */
-  @UseGuards(AuthGuard())
+
   public async refreshClientToken(tokenResponse: TokenResponse): Promise<void> {
     try {
       await this.server.emit(REFRESH_TOKEN, tokenResponse);
