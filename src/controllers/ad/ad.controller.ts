@@ -32,7 +32,7 @@ export class AdController {
   @Get()
   public async getActiveDirectoryUsers(): Promise<ActiveDirectoryUser[]> {
     try {
-      return await this.adService.getUsersFromActiveDirectoryMock();
+      return await this.adService.getUsersFromActiveDirectory();
     } catch (error) {
       console.log(error);
     }
