@@ -45,6 +45,8 @@ export class ActiveDirectoryService {
       password: AD_PASSWORD,
       url: AD_URL,
       username: AD_USERNAME,
+      port: 1389
+      
     };
     this.ad = new ActiveDirectory(config);
   }

@@ -3,4 +3,5 @@ export interface ActiveDirectoryConfig {
     baseDN: string;
     username: string;
     password: string; 
+    port: number;
 }
