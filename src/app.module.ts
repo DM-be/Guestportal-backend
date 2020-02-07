@@ -11,12 +11,13 @@ import { AdController } from './controllers/ad/ad.controller';
 import { GuestUserController } from './controllers/guest-user/guest-user.controller';
 import { GuestUserModule } from './services/guest-user/guest-user.module';
 import { GuestUserGateWayModule } from './gateways/guestUser-gateway/guest-user.module';
+import { environment } from './environments/environment';
 
 @Module({
   imports: [
     EidGatewayModule,
     UsersModule,
-    MongooseModule.forRoot('mongodb://localhost:27020/db?replicaSet=rs0',{ useNewUrlParser: true} ),
+    MongooseModule.forRoot(`mongodb://${environment.mongo_ip_port}/db?replicaSet=rs0`,{ useNewUrlParser: true} ),
     AuthModule,
     GuestUserModule,
     GuestUserGateWayModule,
