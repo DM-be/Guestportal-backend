@@ -3,8 +3,8 @@ export const environment = {
   ise_ip: process.env.ISE_IP,
   ise_login_url: `https://${this.ise_ip}:8443/portal/PortalSetup.action?portal=${this.portal}`,
   ise_api_url: `https://${this.ise_ip}:9060/ers/config`,
-  mongo_ip_port: process.env.MONGO_IP_PORT,
-  allowed_origins:  process.env.ALLOWED_ORIGINS
+  mongo_ip_port: process.env.MONGO_IP_PORT || 'localhost:27020',
+  allowed_origins:  process.env.ALLOWED_ORIGINS || 'localhost:4200'
 };
 
 
