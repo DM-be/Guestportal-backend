@@ -287,7 +287,7 @@ export class GuestUserService {
         toDate,
         personBeingVisited,
         expire: moment() //TODO: remove test --> date with todate
-          .add(1, 'm')
+          .add(4, 'h')
           .toDate(),
       } as GuestUserModel;
     } catch (error) {
@@ -360,7 +360,7 @@ export class GuestUserService {
   ): GuestUser {
     const guestUser: GuestUser = {
       guestInfo,
-      id: guestInfo.emailAddress, // TODO: implement ID generator (name, email,??)
+      id: guestInfo.emailAddress, 
       name: `${guestInfo.firstName} {${guestInfo.lastName}}`, // TODO: check reasoning for name property, still needed?
       guestAccessInfo: this.generateGuestAccessInfo(),
       personBeingVisited,

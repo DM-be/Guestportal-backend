@@ -45,8 +45,7 @@ export class ActiveDirectoryService {
       password: AD_PASSWORD,
       url: AD_URL,
       username: AD_USERNAME,
-      port: 1389
-      
+      port: 1389,
     };
     this.ad = new ActiveDirectory(config);
   }
@@ -75,32 +74,24 @@ export class ActiveDirectoryService {
     return new Promise(resolve => {
       resolve([
         {
-          name: 'john smith',
-          email: 'johnsmit@test.com',
+          name: 'Thomas Boesmans',
+          email: 'tboesmans@spotit.be',
         },
         {
-          name: 'random name',
-          email: 'johnsmit@test.com',
+          name: 'Jos Vermeulen',
+          email: 'jvermeulen@spotit.be',
         },
         {
-          name: 'test name',
-          email: 'johnsmit@test.com',
+          name: 'Jonas Vanacker',
+          email: 'jvanacker@spotit.be',
         },
         {
-          name: 'test name',
-          email: 'johnsmit@test.com',
+          name: 'Lucas De Mol',
+          email: 'ldemol@spotit.be',
         },
         {
-          name: 'test name',
-          email: 'johnsmit@test.com',
-        },
-        {
-          name: 'test name',
-          email: 'johnsmit@test.com',
-        },
-        {
-          name: 'test name',
-          email: 'johnsmit@test.com',
+          name: 'David Gooskens',
+          email: 'dgoostekns@spotit.be',
         },
       ] as ActiveDirectoryUser[]);
     });

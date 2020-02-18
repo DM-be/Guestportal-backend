@@ -54,8 +54,8 @@ export class Pkcs11Service {
   constructor(private readonly eidGateway: EidGateway) {
     this.pkcs11 = new PKCS11();
     this.devices = new Devices();
-   // this.pkcs11.load(LIB);
-   // this.listenToEidCardEvents();
+    this.pkcs11.load(LIB);
+    this.listenToEidCardEvents();
   }
 
   /**

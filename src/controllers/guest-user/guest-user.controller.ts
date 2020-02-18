@@ -1,8 +1,9 @@
-import { Controller, Post, Body, Get } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards } from '@nestjs/common';
 import { GuestUserService } from 'src/services/guest-user/guest-user.service';
 import { ApiTags, ApiOkResponse } from '@nestjs/swagger';
 import { CreateGuestUserDto } from 'src/models/CreateGuestUserDto.dto';
 import { GuestUserModel } from 'src/models/GuestUserModel';
+import { AuthGuard } from '@nestjs/passport';
 
 /**
  * controller responsible for creating ISE guest users
@@ -49,6 +50,7 @@ export class GuestUserController {
    * @memberof GuestUserController
    */
   @Get()
+ // @UseGuards(AuthGuard()) 
   getGuestUsers(): GuestUserModel[] {
     try {
       return this.guestUserService.guestUsers$.getValue();
