@@ -78,7 +78,8 @@ export class GuestUserGateWay implements OnGatewayConnection {
   @SubscribeMessage(REMOVE_USER)
   public async removeGuestUser(removeGuestUserDto: RemoveGuestUserDto) {
     try {
-      await this.guestUserService.removeGuestUser(removeGuestUserDto);
+    //  console.log(removeGuestUserDto);
+     // await this.guestUserService.removeGuestUser(removeGuestUserDto);
     } catch (error) {
       console.log(error);
       return await Promise.reject(error);
