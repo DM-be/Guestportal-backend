@@ -6,6 +6,7 @@ import { AxiosIseAuth } from 'src/models/AxiosIseAuth';
 import { ActiveDirectoryUser } from 'src/models/ActiveDirectoryUser';
 import * as https from 'https';
 import { environment } from 'src/environments/environment';
+import { ERSResponse } from 'src/models/ERSResponse';
 
 const PORTAL_ID = environment.portal; //'f10871e0-7159-11e7-a355-005056aba474';
 const GUESTUSER = 'identity.guestuser.2.0';
@@ -18,10 +19,10 @@ const GUESTUSER = 'identity.guestuser.2.0';
  */
 @Injectable()
 export class IseService {
-  private BASE_URL = environment.ise_api_url; //'https://172.21.106.51:9060/ers/config';
+  private BASE_URL = 'https://172.21.106.51:9060/ers/config'; //'https://172.21.106.51:9060/ers/config';
   private AXIOSISEAUTH: AxiosIseAuth = {
-    username: 'portaluser',
-    password: 'Vergeten123!',
+    username: 'guestAPI',
+    password: ' bO5D',
   };
   //TODO: get values from vault in constructor/ docker-compose env
 
@@ -39,7 +40,7 @@ export class IseService {
       const url = `${this.BASE_URL}/guestuser/email/${guestUserId}/portalId/${PORTAL_ID}`;
       return await Axios.put(url);
     } catch (error) {
-      this.handleError(error, 'could not send email to guestuser');
+      this.handleError(error);
     }
   }
 
@@ -55,15 +56,16 @@ export class IseService {
     iseGuestUserDto: IseGuestUserDto,
   ): Promise<AxiosResponse> {
     try {
-      console.log(iseGuestUserDto);
-      const url = `${this.BASE_URL}/guestuser`;
+      // console.log(iseGuestUserDto);
+      const url = `${this.BASE_URL}/guestuser/`;
       return await Axios.post(
         url,
         iseGuestUserDto,
         this.generateAxiosRequestConfig(GUESTUSER),
       );
     } catch (error) {
-      this.handleError(error, 'could not create create guestuser');
+      console.log(error);
+      this.handleError(error);
     }
   }
 
@@ -79,10 +81,29 @@ export class IseService {
     guestUserEmailAsId: string,
   ): Promise<AxiosResponse> {
     try {
-      const url = `${this.BASE_URL}/guestuser/${guestUserEmailAsId}`;
-      return await Axios.delete(url); // 204
+      const X = `${this.BASE_URL}/guestuser/name/${guestUserEmailAsId}`;
+      const url = encodeURI(X);
+      console.log(url)
+      console.log('remove')
+      return await Axios.delete(url, this.generateAxiosRequestConfig(GUESTUSER)); // 204
     } catch (error) {
-      this.handleError(error, 'could not create delete guestuser');
+      console.log(error);
+      this.handleError(error);
+    }
+  }
+
+  public async getAllGuestUsers(): Promise<any> {
+    try {
+      const url = `${this.BASE_URL}/guestuser/`;
+      const axiosResponse = await Axios.get(
+        url,
+        this.generateAxiosRequestConfig(),
+      );
+      console.log('request finished');
+      console.log(axiosResponse.data);
+      return axiosResponse.data;
+    } catch (error) {
+      console.log(error);
     }
   }
 
@@ -96,9 +117,11 @@ export class IseService {
    * @returns {AxiosRequestConfig} a valid AxiosRequestConfig used by Axios requests
    * @memberof IseService
    */
-  private generateAxiosRequestConfig(mediatype: string): AxiosRequestConfig {
+  private generateAxiosRequestConfig(mediatype?: string): AxiosRequestConfig {
     const headers = new AxiosIseRequestHeader();
-    headers.setMediaType(mediatype);
+    if (mediatype) {
+      headers.setMediaType(mediatype);
+    }
     return {
       auth: this.AXIOSISEAUTH,
       headers,
@@ -117,13 +140,17 @@ export class IseService {
    * @param {string} errorMessage the errormessage
    * @memberof IseService
    */
-  private handleError(axiosError: AxiosError, errorMessage: string) {
+  private handleError(axiosError: AxiosError) {
+    const resp = axiosError.response.data.ERSResponse as ERSResponse;
+    console.log(resp.messages[0].title);
+    console.log(axiosError.response.status)
     if (axiosError.response.status === 400) {
-      console.log(
-        `${errorMessage}; errorStatusText: ${axiosError.response.statusText}`,
-      );
-    } else {
-      console.log(`unknown error occured ${axiosError}`);
+      const resp = axiosError.response.data.ERSResponse as ERSResponse;
+      console.log(resp.messages[0].title);
     }
+    else if(axiosError.response.status === 401)
+    {
+      console.log('unauthorized');
+    } 
   }
 }
