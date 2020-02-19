@@ -1,6 +1,6 @@
 export const environment = {
-  portal: process.env.PORTAL,
-  ise_ip: process.env.ISE_IP,
+  portal: process.env.PORTAL || 'f10871e0-7159-11e7-a355-005056aba474',
+  ise_ip: process.env.ISE_IP || '172.21.106.51',
   ise_login_url: `https://${this.ise_ip}:8443/portal/PortalSetup.action?portal=${this.portal}`,
   ise_api_url: `https://${this.ise_ip}:9060/ers/config`,
   mongo_ip_port: process.env.MONGO_IP_PORT || 'localhost:27020',
