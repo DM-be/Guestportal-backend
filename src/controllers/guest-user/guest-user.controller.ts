@@ -1,9 +1,10 @@
-import { Controller, Post, Body, Get, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards, Delete, Param } from '@nestjs/common';
 import { GuestUserService } from 'src/services/guest-user/guest-user.service';
 import { ApiTags, ApiOkResponse } from '@nestjs/swagger';
 import { CreateGuestUserDto } from 'src/models/CreateGuestUserDto.dto';
 import { GuestUserModel } from 'src/models/GuestUserModel';
 import { AuthGuard } from '@nestjs/passport';
+import { RemoveGuestUserDto } from 'src/models/RemoveGuestUserDto';
 
 /**
  * controller responsible for creating ISE guest users
@@ -41,6 +42,33 @@ export class GuestUserController {
       return error;
     }
   }
+
+
+    /**
+   * removes an ISE guest user using the guestuser service
+   *
+   * @param {RemoveGuestUserDto} removeGuestUserDto
+   * @returns {Promise<void>}
+   * @memberof GuestUserController
+   */
+  @ApiOkResponse({
+    description: 'removed ise guest user successfully',
+  })
+
+  
+  @Delete(':emailAddress')
+  async removeIseGuestUser(
+    @Param('emailAddress') emailAddress: string,
+  ): Promise<void> {
+    try {
+      console.log(` removing ${emailAddress}`)
+      return await this.guestUserService.removeGuestUser(emailAddress);
+    } catch (error) {
+      return error;
+    }
+  }
+
+
 
   /**
    *returns an array of Guest User Models
