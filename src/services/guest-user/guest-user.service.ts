@@ -12,6 +12,7 @@ import { Model } from 'mongoose';
 import { BehaviorSubject } from 'rxjs';
 import { RemoveGuestUserDto } from 'src/models/RemoveGuestUserDto';
 import { environment } from 'src/environments/environment';
+import * as uuidv4 from 'uuid/v4';
 
 //TODO: move to env
 const LOCATION = 'Brussels';
@@ -98,10 +99,7 @@ export class GuestUserService {
       GuestUser: guestUser,
     };
     try {
-      console.log('creating guest users');
       await this.iseService.createISEGuestUser(iseGuestUserDto);
-      let users = await this.iseService.getAllGuestUsers();
-      console.log(users);
       const guestUserModel = this.createGuestUserModel(guestUser);
       await this.saveGuestUserModelToMongodb(guestUserModel);
       this.guestUsers$.next(
@@ -122,12 +120,12 @@ export class GuestUserService {
    * @returns {Promise<void>}
    * @memberof GuestUserService
    */
-  public async removeGuestUser(emailAddress: string): Promise<void> {
+  public async removeGuestUser(id: string): Promise<void> {
     try {
-      await this.iseService.deleteISEGuestUser(emailAddress);
-      await this.deleteGuestUserModelFromMongodb(emailAddress);
+      await this.iseService.deleteISEGuestUser(id);
+      await this.deleteGuestUserModelFromMongodb(id);
       this.guestUsers$.next(
-        await this.removeGuestUserModelFromGuestUsers$Value(emailAddress),
+        await this.removeGuestUserModelFromGuestUsers$Value(id),
       );
     } catch (error) {
       return Promise.reject(new InternalServerErrorException(error));
@@ -191,18 +189,16 @@ export class GuestUserService {
    * Returns the modified array after removing the model.
    *
    * @private
-   * @param {string} emailAddress
+   * @param {string} id
    * @returns {GuestUserModel []}
    * @memberof GuestUserService
    */
   private removeGuestUserModelFromGuestUsers$Value(
-    emailAddress: string,
+    id: string,
   ): GuestUserModel[] {
     try {
       const guestUserModels = this.guestUsers$.getValue();
-      const i = guestUserModels.findIndex(
-        gu => gu.emailAddress === emailAddress,
-      );
+      const i = guestUserModels.findIndex(gu => gu.id === id);
       guestUserModels.splice(i, 1);
       return guestUserModels;
     } catch (error) {
@@ -248,15 +244,13 @@ export class GuestUserService {
    *
    * Deletes an entry from the mongodb. Uses the unique email address identifier.
    * @private
-   * @param {string} emailAddress
+   * @param {string} id
    * @returns {Promise<void>} empty promise when the operation succeeds
    * @memberof GuestUserService
    */
-  private async deleteGuestUserModelFromMongodb(
-    emailAddress: string,
-  ): Promise<void> {
+  private async deleteGuestUserModelFromMongodb(id: string): Promise<void> {
     try {
-      await this.guestUserModel.deleteOne({ emailAddress });
+      await this.guestUserModel.deleteOne({ id });
     } catch (error) {
       return Promise.reject(new InternalServerErrorException(error));
     }
@@ -273,10 +267,11 @@ export class GuestUserService {
    */
   private createGuestUserModel(guestUser: GuestUser): GuestUserModel {
     try {
-      const { personBeingVisited } = guestUser;
+      const { personBeingVisited, id } = guestUser;
       const { fromDate, toDate } = guestUser.guestAccessInfo;
       const { emailAddress, firstName, lastName } = guestUser.guestInfo;
       return {
+        id,
         emailAddress,
         firstName,
         lastName,
@@ -356,8 +351,8 @@ export class GuestUserService {
     reasonForVisit: string,
   ): GuestUser {
     const guestUser: GuestUser = {
+      id: uuidv4(),
       guestInfo,
-      id: guestInfo.emailAddress,
       name: `${guestInfo.firstName} {${guestInfo.lastName}}`, // TODO: check reasoning for name property, still needed?
       guestAccessInfo: this.generateGuestAccessInfo(),
       personBeingVisited,

@@ -3,7 +3,7 @@ import { GuestInfo } from "./GuestInfo";
 
 export interface GuestUser {
     name: string; // resource name
-    id: string; // resource UUID --> "guestuserId" for deletebyid
+    id?: string; // resource UUID --> "guestuserId" for deletebyid
     description?: string;
     customFields?: Object; // key value map
     guestType: string;
