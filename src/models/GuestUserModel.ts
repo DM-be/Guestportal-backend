@@ -1,5 +1,5 @@
 export interface GuestUserModel {
-    id: string; // ISE id
+    userName: string; // ISE id
     firstName: string;
     lastName: string;
     fromDate: string;

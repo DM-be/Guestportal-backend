@@ -77,9 +77,11 @@ export class IseService {
    * @returns {Promise<AxiosResponse>} Axios response containing status/data/...
    * @memberof IseService
    */
-  public async deleteISEGuestUser(id: string): Promise<AxiosResponse> {
+  public async deleteISEGuestUser(userName: string): Promise<AxiosResponse> {
     try {
-      const url = `${this.BASE_URL}/guestuser/id/${id}`;
+      
+      const url = `${this.BASE_URL}/guestuser/name/${userName}`;
+      console.log(url);
       return await Axios.delete(
         url,
         this.generateAxiosRequestConfig(GUESTUSER),

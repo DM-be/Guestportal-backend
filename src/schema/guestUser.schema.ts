@@ -1,6 +1,11 @@
 import * as mongoose from 'mongoose';
 
 export const GuestUserSchema = new mongoose.Schema({
+  userName: {
+    type: String,
+    required: true,
+    unique: true,
+  },
   firstName: {
     type: String,
     required: true,
