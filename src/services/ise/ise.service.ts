@@ -7,6 +7,7 @@ import { ActiveDirectoryUser } from 'src/models/ActiveDirectoryUser';
 import * as https from 'https';
 import { environment } from 'src/environments/environment';
 import { ERSResponse } from 'src/models/ERSResponse';
+import { GuestUser } from 'src/models/GuestUser';
 
 const PORTAL_ID = environment.portal; //'f10871e0-7159-11e7-a355-005056aba474';
 const GUESTUSER = 'identity.guestuser.2.0';
@@ -54,9 +55,8 @@ export class IseService {
    */
   public async createISEGuestUser(
     iseGuestUserDto: IseGuestUserDto,
-  ): Promise<AxiosResponse> {
+  ): Promise<void> {
     try {
-      // console.log(iseGuestUserDto);
       const url = `${this.BASE_URL}/guestuser/`;
       return await Axios.post(
         url,
@@ -77,31 +77,26 @@ export class IseService {
    * @returns {Promise<AxiosResponse>} Axios response containing status/data/...
    * @memberof IseService
    */
-  public async deleteISEGuestUser(
-    guestUserEmailAsId: string,
-  ): Promise<AxiosResponse> {
+  public async deleteISEGuestUser(id: string): Promise<AxiosResponse> {
     try {
-      const X = `${this.BASE_URL}/guestuser/name/${guestUserEmailAsId}`;
-      const url = encodeURI(X);
-      console.log(url)
-      console.log('remove')
-      return await Axios.delete(url, this.generateAxiosRequestConfig(GUESTUSER)); // 204
+      const url = `${this.BASE_URL}/guestuser/id/${id}`;
+      return await Axios.delete(
+        url,
+        this.generateAxiosRequestConfig(GUESTUSER),
+      );
     } catch (error) {
-      console.log(error);
       this.handleError(error);
     }
   }
 
-  public async getAllGuestUsers(): Promise<any> {
+  public async getAllGuestUsers(): Promise<GuestUser[]> {
     try {
       const url = `${this.BASE_URL}/guestuser/`;
       const axiosResponse = await Axios.get(
         url,
         this.generateAxiosRequestConfig(),
       );
-      console.log('request finished');
-      console.log(axiosResponse.data);
-      return axiosResponse.data;
+      return axiosResponse.data as GuestUser[];
     } catch (error) {
       console.log(error);
     }
@@ -141,16 +136,11 @@ export class IseService {
    * @memberof IseService
    */
   private handleError(axiosError: AxiosError) {
-    const resp = axiosError.response.data.ERSResponse as ERSResponse;
-    console.log(resp.messages[0].title);
-    console.log(axiosError.response.status)
     if (axiosError.response.status === 400) {
       const resp = axiosError.response.data.ERSResponse as ERSResponse;
       console.log(resp.messages[0].title);
-    }
-    else if(axiosError.response.status === 401)
-    {
+    } else if (axiosError.response.status === 401) {
       console.log('unauthorized');
-    } 
+    }
   }
 }
