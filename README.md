@@ -26,7 +26,7 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+A Node backend server built in the NestJS framework for the custom web portal implementation built by Dennis Morent.
 
 ## Installation
 
@@ -40,36 +40,18 @@ $ npm install
 # development
 $ npm run start
 
-# watch mode
-$ npm run start:dev
-
 # production mode
 $ npm run start:prod
 ```
 
-## Test
+## Exposed ports
+The default exposed ports are: 5000 and 5001 for the gateway.
 
-```bash
-# unit tests
-$ npm run test
+## Environment
+The environment is configured in the environments/environment.ts file.
+The variables in this file are set using the node environment variables, when undefined defaults to some default testing values.
 
-# e2e tests
-$ npm run test:e2e
+## Documentation
 
-# test coverage
-$ npm run test:cov
-```
+Documentation of the API is available at http://localhost:5000/api/
 
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-  Nest is [MIT licensed](LICENSE).
