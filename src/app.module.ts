@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { Pkcs11Service } from './services/pkcs11/pkcs11.service';
 import { EidGatewayModule } from './gateways/eid-gateway/eid-gateway.module';
 import { IseService } from './services/ise/ise.service';
 import { UsersModule } from './services/users/users.module';
@@ -24,7 +23,6 @@ import { environment } from './environments/environment';
   ],
   controllers: [AppController, AdController, GuestUserController],
   providers: [
-    Pkcs11Service,
     EidGatewayModule,
     GuestUserGateWayModule,
     IseService,
