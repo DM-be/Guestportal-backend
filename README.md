@@ -57,7 +57,7 @@ The variables in this file are set using the node environment variables, when un
 ### Setup
 
 
-Run following commands to deploy locally after installing the Mongo daemon:
+Run following commands to run mongoDB locally after installing the Mongo daemon:
 
 ```bash
 
@@ -112,7 +112,12 @@ The replicaset is now available with the following connection string:
 
 'mongodb://localhost:27020/?replicaSet=rs0'
 
+
 ## Documentation
 
 Documentation of the API is available at http://localhost:5000/api/
 
+### Informational links
+
+https://docs.mongodb.com/manual/replication/
+https://docs.mongodb.com/manual/tutorial/deploy-replica-set-for-testing/
