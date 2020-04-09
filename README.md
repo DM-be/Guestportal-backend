@@ -1,34 +1,48 @@
 ## Description
 
-A Node backend server built in the NestJS framework for the custom web portal implementation built by Dennis Morent.
+A Node backend server built in the NestJS framework for the custom guest portal implementation.
 
-## Installation
+## Requirements
 
-```bash
-$ npm install
-```
+The backend server should integrate with Cisco Identity Services and LDAP. Cisco ISE is a AAA servicer that provides security and access to all networks in a corporate enviroment. Cisco ISE provides an API to handle requests such as adding a guest user account to a guest network. 
+The backend should also integrate with active directory to provide a list of employees a visitor would be visiting. 
 
-## Running the app
+Controllers and services should be provided to handle CRUD operations such as adding a guest user or removing access for a guest user. 
+The backend keeps track of admin users using the frontend (front desk employees) and registered guest users. 
 
-```bash
-# development
-$ npm run start
+## Implementation
 
-# production mode
-$ npm run start:prod
-```
+Every requirement is implemented in a separate service.
+Controllers respond to HTTP requests and delegates them to the appropiate service. 
+Certain requests are protected with an authentication guard. A JWT token passport strategy is used to validate these requests. 
+Documentation is provided by Swagger.
+A default validation pipe provided by NestJS is used to validate the objects in the request body.
+MongoDB is used as the database. Three replica sets are used for redundancy. 
+When a guest user's access is expired, the corresponding MongoDB record also expires. On this change a BehaviorSubject will emit the new value for use in the frontend table.
 
-## Exposed ports
+
+### Features
+
+* JWT token and passport strategy verification
+* model validation in JSON body of requests using validation pipes
+* MongoDB with redundancy and auto expiring records
+* mocumentation
+* separate services
+* observables that emit real time up to date values
+* basic LDAP integration
+
+
+### Exposed ports
 The default exposed ports are: 5000 and 5001 for the gateway.
 
-## Environment
+### Environment
 The environment is configured in the environments/environment.ts file.
 The variables in this file are set using the node environment variables, when undefined defaults to some default testing values.
 
-## MongoDB
+### MongoDB
 
 
-### Setup
+#### Setup
 
 
 Run following commands to run mongoDB locally after installing the Mongo daemon:
@@ -87,11 +101,7 @@ The replicaset is now available with the following connection string:
 'mongodb://localhost:27020/?replicaSet=rs0'
 
 
-## Documentation
+### Documentation
 
 Documentation of the API is available at http://localhost:5000/api/
 
-### Informational links
-
-https://docs.mongodb.com/manual/replication/\
-https://docs.mongodb.com/manual/tutorial/deploy-replica-set-for-testing/
