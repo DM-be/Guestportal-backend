@@ -25,8 +25,8 @@ Documentation is provided by Swagger.
 * JWT token and passport strategy verification
 * model validation in JSON body of requests using validation pipes
 * MongoDB with redundancy and auto expiring records
-* mocumentation
-* separate services
+* documentation with Swagger
+* singleton services and delegating controllers
 * observables that emit real time up to date values
 * basic LDAP integration
 
