@@ -4,7 +4,7 @@ A Node backend server built in the NestJS framework for the custom guest portal 
 
 ## Project requirements
 
-The backend server should integrate with Cisco Identity Services and LDAP. Cisco ISE is a AAA servicer that provides security and access to all networks in a corporate enviroment. Cisco ISE provides an API to handle requests such as adding a guest user account to a guest network. 
+The backend server should integrate with Cisco Identity Services and LDAP. Cisco ISE is an AAA service that provides security and access to all networks in a corporate enviroment. Cisco ISE provides an API to handle requests such as adding a guest user account to a guest network. 
 The backend should also integrate with active directory to provide a list of employees a visitor would be visiting. 
 
 Controllers and services should be provided to handle CRUD operations such as adding a guest user or removing access for a guest user. 
