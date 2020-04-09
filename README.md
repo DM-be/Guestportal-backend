@@ -13,13 +13,12 @@ The backend keeps track of admin users using the frontend (front desk employees)
 ## Implementation
 
 Every requirement is implemented in a separate service.
-Controllers respond to HTTP requests and delegates them to the appropiate service. 
+Controllers respond to HTTP requests and delegates them to the appropriate service. 
 Certain requests are protected with an authentication guard. A JWT token passport strategy is used to validate these requests. 
-Documentation is provided by Swagger.
 A default validation pipe provided by NestJS is used to validate the objects in the request body.
 MongoDB is used as the database. Three replica sets are used for redundancy. 
 When a guest user's access is expired, the corresponding MongoDB record also expires. On this change a BehaviorSubject will emit the new value for use in the frontend table.
-
+Documentation is provided by Swagger.
 
 ### Features
 
