@@ -30,9 +30,12 @@ Documentation is provided by Swagger.
 * observables that emit real time up to date values
 * basic LDAP integration
 
+#### Schematic overview
+
+![Screenshot](overview.jpg)
 
 ### Exposed ports
-The default exposed ports are: 5000 and 5001 for the gateway.
+The default exposed ports are: 5000 and 5001 for the gateways (websockets).
 
 ### Environment
 The environment is configured in the environments/environment.ts file.
